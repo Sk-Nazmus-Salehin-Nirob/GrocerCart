@@ -36,10 +36,21 @@ function getOCI(): mixed {
 function ociQuery(string $sql, array $binds = []): array {
     $conn  = getOCI();
     $stmt  = oci_parse($conn, $sql);
+    if (!$stmt) {
+        $e = oci_error($conn);
+        error_log('OCI Parse Error: ' . ($e['message'] ?? 'unknown'));
+        return [];
+    }
     foreach ($binds as $key => $val) {
         oci_bind_by_name($stmt, $key, $binds[$key]);
     }
-    oci_execute($stmt, OCI_DEFAULT);
+    $ok = oci_execute($stmt, OCI_DEFAULT);
+    if (!$ok) {
+        $e = oci_error($stmt);
+        error_log('OCI Execute Error: ' . ($e['message'] ?? 'unknown') . ' | SQL: ' . $sql);
+        oci_free_statement($stmt);
+        return [];
+    }
     $rows = [];
     while ($row = oci_fetch_assoc($stmt)) {
         $rows[] = array_change_key_case($row, CASE_LOWER);
@@ -152,9 +163,10 @@ function getNav(): string {
         '.$link('vendors_list.php','<i class="fas fa-truck mr-1"></i>Vendors').'
         '.$link('products_list.php','<i class="fas fa-box mr-1"></i>Products').'
         '.$link('orders_list.php','<i class="fas fa-shopping-bag mr-1"></i>Orders').'
-        '.$link('order_details_list.php','<i class="fas fa-list mr-1"></i>Order Details').'
         '.$link('delivery_list.php','<i class="fas fa-shipping-fast mr-1"></i>Delivery').'
         '.$link('sql_ops.php','<i class="fas fa-code mr-1"></i>SQL Ops').'
+        '.$link('plsql_ops.php','<i class="fas fa-terminal mr-1"></i>PL/SQL').'
+        '.$link('er_diagram.html','<i class="fas fa-sitemap mr-1"></i>ER Diagram').'
       </div>
     </div>
   </div>
