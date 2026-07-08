@@ -25,40 +25,34 @@ $stats = [
 ];
 
 // ── Top 5 Products ─────────────────────────────────────────────────────
-$sql_top = "SELECT p.product_id, p.name, p.category, p.price,
-            NVL(SUM(od.quantity),0) AS total_sold,
-            NVL(SUM(od.subtotal),0) AS revenue
-            FROM Products p
-            LEFT JOIN Order_Details od ON p.product_id = od.product_id
-            GROUP BY p.product_id, p.name, p.category, p.price
-            ORDER BY total_sold DESC
-            FETCH FIRST 5 ROWS ONLY";
+$sql_top = "SELECT * FROM (
+            SELECT product_id, name, category, price, stock_status
+            FROM Products
+            ORDER BY product_id ASC
+            ) WHERE ROWNUM <= 5";
 $sql_log['Top Products'] = $sql_top;
 $top_products = ociQuery($sql_top);
 
 // ── Recent Orders ──────────────────────────────────────────────────────
-$sql_orders = "SELECT o.order_id, TO_CHAR(o.order_date,'YYYY-MM-DD') AS order_date,
-               o.status, o.total_amount, c.name AS customer_name,
-               COUNT(od.order_detail_id) AS items
+$sql_orders = "SELECT * FROM (
+               SELECT o.order_id, TO_CHAR(o.order_date,'YYYY-MM-DD') AS order_date,
+               o.status, o.total_amount, c.name AS customer_name
                FROM Orders o
                INNER JOIN Customers c ON o.customer_id = c.customer_id
-               LEFT JOIN Order_Details od ON o.order_id = od.order_id
-               GROUP BY o.order_id, o.order_date, o.status, o.total_amount, c.name
                ORDER BY o.order_date DESC
-               FETCH FIRST 5 ROWS ONLY";
+               ) WHERE ROWNUM <= 5";
 $sql_log['Recent Orders'] = $sql_orders;
 $recent_orders = ociQuery($sql_orders);
 
 // ── Top Vendors ────────────────────────────────────────────────────────
-$sql_vendors = "SELECT v.vendor_name, v.location,
-                COUNT(DISTINCT p.product_id) AS products,
-                NVL(SUM(od.subtotal),0) AS sales
+$sql_vendors = "SELECT * FROM (
+                SELECT v.vendor_name, v.location,
+                COUNT(DISTINCT p.product_id) AS products
                 FROM Vendors v
                 LEFT JOIN Products p ON v.vendor_id = p.vendor_id
-                LEFT JOIN Order_Details od ON p.product_id = od.product_id
                 GROUP BY v.vendor_name, v.location
-                ORDER BY sales DESC
-                FETCH FIRST 5 ROWS ONLY";
+                ORDER BY products DESC
+                ) WHERE ROWNUM <= 5";
 $sql_log['Top Vendors'] = $sql_vendors;
 $top_vendors = ociQuery($sql_vendors);
 
@@ -131,11 +125,11 @@ echo getNav();
             <span class="w-7 h-7 flex-shrink-0 bg-orange-100 text-orange-700 font-bold text-sm rounded-full flex items-center justify-center"><?= $i+1 ?></span>
             <div class="flex-1 min-w-0">
               <p class="font-semibold text-sm truncate"><?= htmlspecialchars($p['name']) ?></p>
-              <p class="text-xs text-gray-500"><?= htmlspecialchars($p['category']) ?> &middot; $<?= number_format($p['price'],2) ?></p>
+              <p class="text-xs text-gray-500"><?= htmlspecialchars($p['category']) ?></p>
             </div>
             <div class="text-right flex-shrink-0">
-              <p class="font-bold text-sm"><?= $p['total_sold'] ?> units</p>
-              <p class="text-xs text-green-600">$<?= number_format($p['revenue'],2) ?></p>
+              <p class="font-bold text-sm text-green-600">$<?= number_format($p['price'],2) ?></p>
+              <p class="text-xs text-gray-500"><?= htmlspecialchars($p['stock_status']) ?></p>
             </div>
           </div>
           <?php endforeach; ?>
@@ -165,7 +159,6 @@ echo getNav();
             </div>
             <div class="text-right flex-shrink-0">
               <p class="font-bold text-sm"><?= $v['products'] ?> products</p>
-              <p class="text-xs text-green-600">$<?= number_format($v['sales'],2) ?></p>
             </div>
           </div>
           <?php endforeach; ?>
@@ -192,7 +185,6 @@ echo getNav();
             <th class="px-4 py-3 text-left font-semibold text-gray-600">Order</th>
             <th class="px-4 py-3 text-left font-semibold text-gray-600">Customer</th>
             <th class="px-4 py-3 text-left font-semibold text-gray-600">Date</th>
-            <th class="px-4 py-3 text-left font-semibold text-gray-600">Items</th>
             <th class="px-4 py-3 text-left font-semibold text-gray-600">Amount</th>
             <th class="px-4 py-3 text-left font-semibold text-gray-600">Status</th>
           </tr></thead>
@@ -206,7 +198,6 @@ echo getNav();
               <td class="px-4 py-3 font-mono font-semibold">#<?= $o['order_id'] ?></td>
               <td class="px-4 py-3"><?= htmlspecialchars($o['customer_name']) ?></td>
               <td class="px-4 py-3 text-gray-500"><?= $o['order_date'] ?></td>
-              <td class="px-4 py-3"><?= $o['items'] ?></td>
               <td class="px-4 py-3 font-semibold text-green-700">$<?= number_format($o['total_amount'],2) ?></td>
               <td class="px-4 py-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold <?= $cls ?>"><?= ucfirst($o['status']) ?></span></td>
             </tr>
@@ -218,13 +209,12 @@ echo getNav();
   </div>
 
   <!-- Quick Links -->
-  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
     <?php $links=[
       ['customers_list.php','users','Customers','blue'],
       ['vendors_list.php','truck','Vendors','purple'],
       ['products_list.php','box','Products','green'],
       ['orders_list.php','shopping-bag','Orders','orange'],
-      ['order_details_list.php','list','Order Details','indigo'],
       ['delivery_list.php','shipping-fast','Delivery','red'],
     ]; foreach($links as [$href,$icon,$lbl,$col]): ?>
     <a href="<?= $href ?>" class="bg-white rounded-xl shadow p-4 flex flex-col items-center gap-2 hover:shadow-lg hover:-translate-y-1 transition">
