@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Oracle SQL*Plus – Command Line Reference</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;font-size:13px;line-height:1.7;color:#1e293b;background:#0f172a;}
+@media print{
+  body{background:white;font-size:11px;}
+  .no-print{display:none!important;}
+  .page-break{page-break-before:always;}
+  header,pre,.cmd,.note-box,.diff-row td{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px 60px;}
+header{background:linear-gradient(135deg,#1e1b4b,#312e81,#1e3a5f);padding:44px 40px;margin-bottom:36px;}
+header h1{font-size:30px;font-weight:800;color:white;margin-bottom:6px;}
+header p{color:#a5b4fc;font-size:14px;}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
+.chip{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:white;border-radius:20px;padding:5px 14px;font-size:11.5px;font-weight:500;}
+
+/* sections */
+.sec{margin-bottom:44px;}
+.sec-title{font-size:19px;font-weight:800;color:#e2e8f0;border-left:5px solid #6366f1;padding-left:14px;margin-bottom:18px;}
+.num{background:#6366f1;color:white;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-right:8px;}
+
+/* code terminal */
+pre{background:#020617;border:1px solid #1e293b;border-radius:12px;padding:20px 24px;overflow-x:auto;
+    font-family:'Fira Code',monospace;font-size:12.5px;line-height:2;margin:10px 0;
+    color:#e2e8f0;border-left:4px solid #6366f1;}
+.p {color:#a78bfa;}  /* prompt */
+.k {color:#67e8f9;}  /* keyword */
+.s {color:#86efac;}  /* string/value */
+.c {color:#475569;}  /* comment */
+.o {color:#fde68a;}  /* output */
+.e {color:#f87171;}  /* error */
+.g {color:#4ade80;}  /* success */
+
+/* cards */
+.card{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:22px 26px;margin-bottom:16px;}
+.card h3{font-size:14px;font-weight:700;color:#f1f5f9;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.card p,.card li{color:#cbd5e1;font-size:12.5px;}
+.card ul{padding-left:18px;margin-top:6px;}
+.card li{margin-bottom:5px;}
+
+/* inline code */
+code{font-family:'Fira Code',monospace;background:#0f172a;color:#67e8f9;padding:1px 6px;border-radius:4px;font-size:11.5px;}
+
+/* table */
+.tbl-wrap{overflow-x:auto;margin:12px 0;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{background:#312e81;color:white;padding:10px 14px;text-align:left;font-size:11px;letter-spacing:.4px;text-transform:uppercase;}
+td{padding:10px 14px;border-bottom:1px solid #1e293b;color:#cbd5e1;vertical-align:top;}
+tr:nth-child(even) td{background:#1e293b;}
+tr:hover td{background:#334155;}
+td code{color:#86efac;}
+
+/* two col */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:640px){.grid2{grid-template-columns:1fr;}}
+
+/* note */
+.note{border-radius:10px;padding:13px 17px;margin:12px 0;font-size:12.5px;border-left:4px solid;}
+.info{background:#1e3a5f;border-color:#3b82f6;color:#93c5fd;}
+.warn{background:#422006;border-color:#f59e0b;color:#fcd34d;}
+.succ{background:#14532d;border-color:#22c55e;color:#86efac;}
+.dang{background:#450a0a;border-color:#ef4444;color:#fca5a5;}
+.note strong{display:block;margin-bottom:3px;font-weight:700;}
+
+/* diff table for mysql vs oracle */
+.diff-row td:nth-child(2){color:#f87171;}
+.diff-row td:nth-child(3){color:#4ade80;}
+
+/* print btn */
+.print-btn{position:fixed;bottom:26px;right:26px;background:#6366f1;color:white;border:none;
+  border-radius:50px;padding:13px 26px;font-size:13px;font-weight:600;cursor:pointer;
+  box-shadow:0 8px 24px rgba(99,102,241,.5);font-family:'Inter',sans-serif;transition:all .2s;}
+.print-btn:hover{background:#4f46e5;transform:translateY(-2px);}
+
+h4{color:#a5b4fc;font-size:12px;font-weight:600;margin:14px 0 6px;text-transform:uppercase;letter-spacing:.5px;}
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">🖨️ Save as PDF</button>
+
+<header>
+  <h1>⌨️ Oracle SQL*Plus — Command Line Reference</h1>
+  <p>Complete guide to connect, run queries, and use Oracle's command-line interface for GrocerCart</p>
+  <div class="chips">
+    <span class="chip">Oracle XE 11g</span>
+    <span class="chip">SQL*Plus</span>
+    <span class="chip">User: salehin_076923</span>
+    <span class="chip">Service: localhost/XE</span>
+    <span class="chip">Windows / XAMPP</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sec">
+  <div class="sec-title"><span class="num">1</span> What is SQL*Plus?</div>
+  <div class="card">
+    <p><strong style="color:#f1f5f9">SQL*Plus</strong> is Oracle's official command-line tool. It lets you type SQL and PL/SQL commands directly and get immediate results — like a direct window into your Oracle database. It comes pre-installed with Oracle XE.</p>
+    <ul>
+      <li>Location on your PC: <code>C:\oraclexe\app\oracle\product\11.2.0\server\bin\sqlplus.exe</code></li>
+      <li>Or just type <code>sqlplus</code> in CMD / PowerShell (if Oracle is on your PATH)</li>
+    </ul>
+    <div class="note info" style="margin-top:12px">
+      <strong>💡 When to use SQL*Plus vs PHP</strong>
+      SQL*Plus = direct database work (create tables, test queries, see data). PHP = build the web app. For a lab demo, SQL*Plus is what you'd use to show your teacher the raw Oracle queries.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sec">
+  <div class="sec-title"><span class="num">2</span> How to Open SQL*Plus</div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>🪟 Method 1 — Windows Search</h3>
+      <p>Press <kbd style="background:#334155;color:white;padding:2px 7px;border-radius:4px">Win</kbd> and search for <strong>"SQL Plus"</strong> or <strong>"Run SQL Command Line"</strong>. Click the Oracle app that appears.</p>
+    </div>
+    <div class="card">
+      <h3>💻 Method 2 — CMD / PowerShell</h3>
+      <p>Open Command Prompt (cmd) or PowerShell and type:</p>
+      <pre style="margin:8px 0;padding:10px 14px;"><span class="k">sqlplus</span></pre>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📁 Method 3 — Full Path (if sqlplus not on PATH)</h3>
+    <pre>"C:\oraclexe\app\oracle\product\11.2.0\server\bin\sqlplus.exe"</pre>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sec">
+  <div class="sec-title"><span class="num">3</span> Connecting to Oracle</div>
+
+  <h4>Syntax</h4>
+  <pre><span class="k">sqlplus</span> <span class="s">username</span>/<span class="s">password</span>@<span class="s">host</span>:<span class="s">port</span>/<span class="s">service_name</span></pre>
+
+  <h4>Your Exact Connection Commands</h4>
+  <pre><span class="c">-- Connect as your student user (use this one)</span>
+<span class="k">sqlplus</span> <span class="s">salehin_076923</span>/<span class="s">2207045</span>@<span class="s">localhost:1521/XE</span>
+
+<span class="c">-- Shorthand (works the same)</span>
+<span class="k">sqlplus</span> <span class="s">salehin_076923</span>/<span class="s">2207045</span>@<span class="s">localhost/XE</span>
+
+<span class="c">-- Connect as SYSTEM admin (only if needed)</span>
+<span class="k">sqlplus</span> <span class="s">system</span>/<span class="s">your_system_password</span>@<span class="s">localhost/XE</span>
+
+<span class="c">-- Connect and then enter password (more secure)</span>
+<span class="k">sqlplus</span> <span class="s">salehin_076923</span>@<span class="s">localhost/XE</span>
+<span class="c">-- Oracle will prompt: Enter password:</span></pre>
+
+  <h4>What You See After Connecting</h4>
+  <pre><span class="o">SQL*Plus: Release 11.2.0.2.0 Production on Sat Jun 20 20:14:46 2026
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+Connected to:
+Oracle Database 11g Express Edition Release 11.2.0.2.0 - 64bit Production
+
+</span><span class="p">SQL&gt;</span> <span class="c">← You type your commands here</span></pre>
+
+  <div class="note succ">
+    <strong>✅ Connected! You will see SQL&gt;</strong>
+    Everything you type after <code>SQL&gt;</code> is sent to Oracle. Press Enter to execute (for single-line commands) or type <code>/</code> on a new line to run multi-line PL/SQL blocks.
+  </div>
+
+  <h4>How to Exit / Disconnect</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">EXIT</span>
+<span class="c">-- or</span>
+<span class="p">SQL&gt;</span> <span class="k">QUIT</span></pre>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sec page-break">
+  <div class="sec-title"><span class="num">4</span> Basic SQL Commands (Run These in SQL*Plus)</div>
+
+  <h4>🔍 SELECT — Read Data</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">SELECT</span> * <span class="k">FROM</span> Customers;
+
+<span class="o">CUSTOMER_ID NAME                 EMAIL
+----------- -------------------- -------------------------
+          1 Alice Green          alice@example.com
+          2 Bob Brown            bob@example.com
+          3 Carol White          carol@example.com
+</span></pre>
+
+  <pre><span class="c">-- Select specific columns</span>
+<span class="p">SQL&gt;</span> <span class="k">SELECT</span> customer_id, name, email <span class="k">FROM</span> Customers;
+
+<span class="c">-- With WHERE condition</span>
+<span class="p">SQL&gt;</span> <span class="k">SELECT</span> * <span class="k">FROM</span> Customers <span class="k">WHERE</span> name = <span class="s">'Alice Green'</span>;
+
+<span class="c">-- Order results</span>
+<span class="p">SQL&gt;</span> <span class="k">SELECT</span> * <span class="k">FROM</span> Customers <span class="k">ORDER BY</span> name <span class="k">ASC</span>;
+
+<span class="c">-- Limit rows (Oracle syntax)</span>
+<span class="p">SQL&gt;</span> <span class="k">SELECT</span> * <span class="k">FROM</span> Customers <span class="k">FETCH FIRST</span> 3 <span class="k">ROWS ONLY</span>;
+
+<span class="c">-- Count rows</span>
+<span class="p">SQL&gt;</span> <span class="k">SELECT COUNT</span>(*) <span class="k">FROM</span> Customers;
+<span class="o">  COUNT(*)
+----------
+         6</span></pre>
+
+  <h4>➕ INSERT — Add New Row</h4>
+  <pre><span class="c">-- The trigger automatically assigns the ID (no need to specify customer_id)</span>
+<span class="p">SQL&gt;</span> <span class="k">INSERT INTO</span> Customers (name, email, phone, address, preferences)
+  2  <span class="k">VALUES</span> (<span class="s">'John Doe'</span>, <span class="s">'john@example.com'</span>, <span class="s">'999-111-2222'</span>, <span class="s">'10 Oak St'</span>, <span class="s">'vegan'</span>);
+<span class="o">1 row created.</span>
+
+<span class="p">SQL&gt;</span> <span class="k">COMMIT</span>;   <span class="c">-- ← IMPORTANT! Must COMMIT to save permanently in Oracle</span>
+<span class="o">Commit complete.</span></pre>
+
+  <h4>✏️ UPDATE — Edit Existing Row</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">UPDATE</span> Customers
+  2  <span class="k">SET</span> email = <span class="s">'newalice@example.com'</span>, phone = <span class="s">'111-999-8888'</span>
+  3  <span class="k">WHERE</span> customer_id = 1;
+<span class="o">1 row updated.</span>
+
+<span class="p">SQL&gt;</span> <span class="k">COMMIT</span>;
+<span class="o">Commit complete.</span></pre>
+
+  <h4>🗑️ DELETE — Remove a Row</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">DELETE FROM</span> Customers <span class="k">WHERE</span> customer_id = 7;
+<span class="o">1 row deleted.</span>
+
+<span class="p">SQL&gt;</span> <span class="k">COMMIT</span>;
+<span class="o">Commit complete.</span>
+
+<span class="c">-- Delete ALL rows (but keep table structure)</span>
+<span class="p">SQL&gt;</span> <span class="k">DELETE FROM</span> Customers;
+<span class="p">SQL&gt;</span> <span class="k">COMMIT</span>;</pre>
+
+  <div class="note warn">
+    <strong>⚠️ Always COMMIT after INSERT / UPDATE / DELETE in Oracle!</strong>
+    Unlike MySQL which auto-commits, Oracle requires you to explicitly type <code>COMMIT;</code> to save changes. If you type <code>ROLLBACK;</code> instead, all changes since last commit are undone.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sec page-break">
+  <div class="sec-title"><span class="num">5</span> GrocerCart — Specific Queries for Your Tables</div>
+
+  <h4>View All Customers with Their Total Spending</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">SELECT</span> c.customer_id, c.name, c.email,
+  2         <span class="k">COUNT</span>(o.order_id) <span class="k">AS</span> total_orders,
+  3         <span class="k">NVL</span>(<span class="k">SUM</span>(o.total_amount), 0) <span class="k">AS</span> total_spent
+  4  <span class="k">FROM</span> Customers c
+  5  <span class="k">LEFT JOIN</span> Orders o <span class="k">ON</span> c.customer_id = o.customer_id
+  6  <span class="k">GROUP BY</span> c.customer_id, c.name, c.email
+  7  <span class="k">ORDER BY</span> total_spent <span class="k">DESC</span>;
+<span class="c">-- (terminate multi-line query with semicolon on last line)</span></pre>
+
+  <h4>View Products with Vendor Name (INNER JOIN)</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">SELECT</span> p.product_id, p.name, p.price, v.vendor_name, p.category
+  2  <span class="k">FROM</span> Products p
+  3  <span class="k">INNER JOIN</span> Vendors v <span class="k">ON</span> p.vendor_id = v.vendor_id
+  4  <span class="k">ORDER BY</span> p.price <span class="k">DESC</span>;</pre>
+
+  <h4>View Full Order Details (3-Table JOIN)</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">SELECT</span> o.order_id, c.name <span class="k">AS</span> customer, p.name <span class="k">AS</span> product,
+  2         od.quantity, od.subtotal, o.status
+  3  <span class="k">FROM</span> Order_Details od
+  4  <span class="k">INNER JOIN</span> Orders o <span class="k">ON</span> od.order_id = o.order_id
+  5  <span class="k">INNER JOIN</span> Customers c <span class="k">ON</span> o.customer_id = c.customer_id
+  6  <span class="k">INNER JOIN</span> Products p <span class="k">ON</span> od.product_id = p.product_id;</pre>
+
+  <h4>Check the View (CustomerOrderSummary)</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">SELECT</span> * <span class="k">FROM</span> CustomerOrderSummary <span class="k">ORDER BY</span> total_spent <span class="k">DESC</span>;</pre>
+
+  <h4>Call the Stored Procedure</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">DECLARE</span>
+  2      v_vendor   <span class="k">VARCHAR2</span>(150);
+  3      v_category <span class="k">VARCHAR2</span>(100);
+  4  <span class="k">BEGIN</span>
+  5      get_product_details(<span class="s">'Organic Apple'</span>, v_vendor, v_category);
+  6      DBMS_OUTPUT.<span class="k">PUT_LINE</span>(<span class="s">'Vendor: '</span> || v_vendor);
+  7      DBMS_OUTPUT.<span class="k">PUT_LINE</span>(<span class="s">'Category: '</span> || v_category);
+  8  <span class="k">END</span>;
+  9  /   <span class="c">← type / on line 9 to execute the PL/SQL block</span>
+<span class="o">Vendor: Fresh Farms
+Category: Fruits
+
+PL/SQL procedure successfully completed.</span></pre>
+
+  <div class="note info">
+    <strong>💡 Enable DBMS_OUTPUT first</strong>
+    Before calling procedures that use DBMS_OUTPUT.PUT_LINE, run this once per session:
+    <code>SET SERVEROUTPUT ON;</code>
+  </div>
+
+  <h4>INTERSECT — Emails in Both Customers and Vendors</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">SELECT</span> email <span class="k">FROM</span> Customers
+  2  <span class="k">INTERSECT</span>
+  3  <span class="k">SELECT</span> contact_email <span class="k">FROM</span> Vendors;</pre>
+
+  <h4>MINUS — Customer Emails NOT in Vendors</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">SELECT</span> email <span class="k">FROM</span> Customers
+  2  <span class="k">MINUS</span>
+  3  <span class="k">SELECT</span> contact_email <span class="k">FROM</span> Vendors;</pre>
+
+  <h4>UNION — All Emails Combined</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">SELECT</span> email, <span class="s">'Customer'</span> <span class="k">AS</span> type <span class="k">FROM</span> Customers
+  2  <span class="k">UNION</span>
+  3  <span class="k">SELECT</span> contact_email, <span class="s">'Vendor'</span> <span class="k">FROM</span> Vendors
+  4  <span class="k">WHERE</span> contact_email <span class="k">IS NOT NULL</span>
+  5  <span class="k">ORDER BY</span> email;</pre>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sec page-break">
+  <div class="sec-title"><span class="num">6</span> DDL Commands — Tables, Triggers, Sequences</div>
+
+  <h4>See What Tables You Have</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">SELECT</span> table_name <span class="k">FROM</span> user_tables <span class="k">ORDER BY</span> table_name;
+<span class="o">TABLE_NAME
+------------------------------
+CUSTOMERS
+DELIVERY
+ORDER_DETAILS
+ORDERS
+PRODUCTS
+VENDORS</span></pre>
+
+  <h4>See Table Structure (DESCRIBE)</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">DESCRIBE</span> Customers;
+<span class="c">-- or short form:</span>
+<span class="p">SQL&gt;</span> <span class="k">DESC</span> Customers;
+<span class="o"> Name            Null?    Type
+ --------------- -------- ----------------
+ CUSTOMER_ID     NOT NULL NUMBER
+ NAME            NOT NULL VARCHAR2(100)
+ EMAIL                    VARCHAR2(150)
+ PHONE                    VARCHAR2(30)
+ ADDRESS                  VARCHAR2(500)
+ PREFERENCES              VARCHAR2(300)
+ LOYALTY_POINTS           NUMBER
+ CUSTOMER_TIER            VARCHAR2(20)</span></pre>
+
+  <h4>See All Sequences</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">SELECT</span> sequence_name, last_number <span class="k">FROM</span> user_sequences;
+<span class="o">SEQUENCE_NAME                  LAST_NUMBER
+------------------------------ -----------
+SEQ_CUSTOMERS                            7
+SEQ_VENDORS                              7
+SEQ_PRODUCTS                             7
+SEQ_ORDERS                               7
+SEQ_ORDER_DETAILS                       10
+SEQ_DELIVERY                             7</span></pre>
+
+  <h4>See All Triggers</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">SELECT</span> trigger_name, table_name, trigger_type, status
+  2  <span class="k">FROM</span> user_triggers
+  3  <span class="k">ORDER BY</span> table_name;</pre>
+
+  <h4>See All Views</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">SELECT</span> view_name <span class="k">FROM</span> user_views;</pre>
+
+  <h4>See All Procedures</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">SELECT</span> object_name, status <span class="k">FROM</span> user_objects
+  2  <span class="k">WHERE</span> object_type = <span class="s">'PROCEDURE'</span>;</pre>
+
+  <h4>See All Constraints on a Table</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">SELECT</span> constraint_name, constraint_type, search_condition
+  2  <span class="k">FROM</span> user_constraints
+  3  <span class="k">WHERE</span> table_name = <span class="s">'CUSTOMERS'</span>;</pre>
+
+  <h4>Drop a Table</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">DROP TABLE</span> Customers <span class="k">CASCADE CONSTRAINTS</span>;
+<span class="c">-- CASCADE CONSTRAINTS also removes any FK constraints referencing this table</span></pre>
+
+  <h4>Truncate (Delete All Rows but Keep Table)</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">TRUNCATE TABLE</span> Order_Details;
+<span class="c">-- Faster than DELETE, auto-commits, cannot rollback</span></pre>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sec page-break">
+  <div class="sec-title"><span class="num">7</span> SQL*Plus Special Commands (NOT SQL)</div>
+
+  <div class="note info">
+    <strong>💡 Two types of commands in SQL*Plus</strong>
+    <strong>SQL commands</strong> end with <code>;</code> and are sent to Oracle (e.g. SELECT, INSERT).
+    <strong>SQL*Plus commands</strong> do NOT end with <code>;</code> and control the environment (e.g. SET, SHOW, SPOOL).
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Command</th><th>What It Does</th><th>Example</th></tr>
+      <tr><td><code>SHOW USER</code></td><td>Shows who you are logged in as</td><td><code>SHOW USER</code> → <em>USER is "SALEHIN_076923"</em></td></tr>
+      <tr><td><code>SET SERVEROUTPUT ON</code></td><td>Enables DBMS_OUTPUT.PUT_LINE to print</td><td>Run before calling procedures</td></tr>
+      <tr><td><code>SET LINESIZE 200</code></td><td>Sets output line width (avoid wrapping)</td><td><code>SET LINESIZE 200</code></td></tr>
+      <tr><td><code>SET PAGESIZE 50</code></td><td>Rows per page before headers repeat</td><td><code>SET PAGESIZE 100</code></td></tr>
+      <tr><td><code>SHOW ALL</code></td><td>Shows all current settings</td><td>—</td></tr>
+      <tr><td><code>DESCRIBE table</code></td><td>Shows column structure of a table</td><td><code>DESC Customers</code></td></tr>
+      <tr><td><code>SPOOL file.txt</code></td><td>Saves all output to a text file</td><td><code>SPOOL C:\output.txt</code></td></tr>
+      <tr><td><code>SPOOL OFF</code></td><td>Stops saving to file</td><td><code>SPOOL OFF</code></td></tr>
+      <tr><td><code>@file.sql</code></td><td>Runs a .sql script file</td><td><code>@C:\scripts\setup.sql</code></td></tr>
+      <tr><td><code>/ </code></td><td>Re-runs the last SQL command</td><td>Just type <code>/</code> and Enter</td></tr>
+      <tr><td><code>L</code> or <code>LIST</code></td><td>Shows the last SQL command in buffer</td><td>—</td></tr>
+      <tr><td><code>CL BUFF</code></td><td>Clears the SQL buffer</td><td>—</td></tr>
+      <tr><td><code>EXIT</code> / <code>QUIT</code></td><td>Disconnects and closes SQL*Plus</td><td>—</td></tr>
+      <tr><td><code>CONNECT user/pass@host</code></td><td>Switch user without exiting</td><td><code>CONN salehin_076923/2207045@localhost/XE</code></td></tr>
+      <tr><td><code>DISCONNECT</code></td><td>Logs off but stays in SQL*Plus</td><td>—</td></tr>
+      <tr><td><code>HOST</code> or <code>!</code></td><td>Run an OS command without exiting</td><td><code>HOST dir</code> or <code>! ls</code></td></tr>
+    </table>
+  </div>
+
+  <h4>Complete Session Example (What to type step by step)</h4>
+  <pre><span class="c">-- Step 1: Start SQL*Plus and connect</span>
+<span class="k">sqlplus</span> <span class="s">salehin_076923</span>/<span class="s">2207045</span>@<span class="s">localhost/XE</span>
+
+<span class="c">-- Step 2: Enable output for procedures</span>
+<span class="p">SQL&gt;</span> <span class="k">SET SERVEROUTPUT ON</span>
+
+<span class="c">-- Step 3: Make output wider so tables don't wrap</span>
+<span class="p">SQL&gt;</span> <span class="k">SET LINESIZE 200</span>
+<span class="p">SQL&gt;</span> <span class="k">SET PAGESIZE 50</span>
+
+<span class="c">-- Step 4: Check who you are</span>
+<span class="p">SQL&gt;</span> <span class="k">SHOW USER</span>
+<span class="o">USER is "SALEHIN_076923"</span>
+
+<span class="c">-- Step 5: List your tables</span>
+<span class="p">SQL&gt;</span> <span class="k">SELECT</span> table_name <span class="k">FROM</span> user_tables;
+
+<span class="c">-- Step 6: Query data</span>
+<span class="p">SQL&gt;</span> <span class="k">SELECT</span> * <span class="k">FROM</span> Customers;
+
+<span class="c">-- Step 7: Save output to a file</span>
+<span class="p">SQL&gt;</span> <span class="k">SPOOL</span> <span class="s">C:\grocercart_output.txt</span>
+<span class="p">SQL&gt;</span> <span class="k">SELECT</span> * <span class="k">FROM</span> Customers;
+<span class="p">SQL&gt;</span> <span class="k">SELECT</span> * <span class="k">FROM</span> Orders;
+<span class="p">SQL&gt;</span> <span class="k">SPOOL OFF</span>
+<span class="c">-- Now C:\grocercart_output.txt contains both query results</span>
+
+<span class="c">-- Step 8: Exit</span>
+<span class="p">SQL&gt;</span> <span class="k">EXIT</span>
+<span class="o">Disconnected from Oracle Database 11g Express Edition...</span></pre>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sec page-break">
+  <div class="sec-title"><span class="num">8</span> Running a .sql Script File</div>
+
+  <div class="card">
+    <h3>📄 What is a .sql File?</h3>
+    <p>You can write multiple SQL commands in a text file (save it as <code>.sql</code>), then run it all at once in SQL*Plus. This is exactly what <code>init_db.php</code> does, but via PHP.</p>
+  </div>
+
+  <h4>Example: Create a file called <code>C:\test.sql</code></h4>
+  <pre><span class="c">-- C:\test.sql contents:</span>
+<span class="k">SET SERVEROUTPUT ON</span>
+<span class="k">SET LINESIZE 200</span>
+
+<span class="k">SELECT</span> * <span class="k">FROM</span> Customers;
+<span class="k">SELECT</span> * <span class="k">FROM</span> Vendors;
+<span class="k">SELECT</span> COUNT(*) <span class="k">AS</span> total_orders <span class="k">FROM</span> Orders;
+
+<span class="k">BEGIN</span>
+    DBMS_OUTPUT.<span class="k">PUT_LINE</span>(<span class="s">'Script complete!'</span>);
+<span class="k">END</span>;
+/</pre>
+
+  <h4>Run It in SQL*Plus</h4>
+  <pre><span class="p">SQL&gt;</span> @C:\test.sql
+<span class="c">-- or</span>
+<span class="p">SQL&gt;</span> START C:\test.sql</pre>
+
+  <h4>Run Script Directly from CMD (without entering SQL*Plus first)</h4>
+  <pre><span class="k">sqlplus</span> <span class="s">salehin_076923</span>/<span class="s">2207045</span>@<span class="s">localhost/XE</span> @C:\test.sql</pre>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sec page-break">
+  <div class="sec-title"><span class="num">9</span> PL/SQL Blocks in SQL*Plus</div>
+
+  <div class="note info">
+    <strong>💡 How to run PL/SQL (multi-line blocks)</strong>
+    For PL/SQL blocks (DECLARE/BEGIN/END), you must end with a <code>/</code> on its own line. The semicolon <code>;</code> ends individual statements INSIDE the block, but <code>/</code> tells SQL*Plus to execute the entire block.
+  </div>
+
+  <h4>Anonymous PL/SQL Block</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">DECLARE</span>
+  2      v_count <span class="k">NUMBER</span>;
+  3  <span class="k">BEGIN</span>
+  4      <span class="k">SELECT COUNT</span>(*) <span class="k">INTO</span> v_count <span class="k">FROM</span> Customers;
+  5      DBMS_OUTPUT.<span class="k">PUT_LINE</span>(<span class="s">'Total customers: '</span> || v_count);
+  6  <span class="k">END</span>;
+  7  /    <span class="c">← this / runs the block</span>
+<span class="o">Total customers: 6
+
+PL/SQL procedure successfully completed.</span></pre>
+
+  <h4>Create a Trigger in SQL*Plus</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">CREATE OR REPLACE TRIGGER</span> trg_check_price
+  2  <span class="k">BEFORE INSERT OR UPDATE OF</span> price <span class="k">ON</span> Products
+  3  <span class="k">FOR EACH ROW</span>
+  4  <span class="k">BEGIN</span>
+  5      <span class="k">IF</span> :NEW.price < 0 <span class="k">THEN</span>
+  6          RAISE_APPLICATION_ERROR(-20001, <span class="s">'Price cannot be negative'</span>);
+  7      <span class="k">END IF</span>;
+  8  <span class="k">END</span>;
+  9  /
+<span class="o">Trigger created.</span></pre>
+
+  <h4>Create a Sequence in SQL*Plus</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">CREATE SEQUENCE</span> seq_customers
+  2  <span class="k">START WITH</span> 1
+  3  <span class="k">INCREMENT BY</span> 1
+  4  <span class="k">NOCACHE NOCYCLE</span>;
+<span class="o">Sequence created.</span>
+
+<span class="c">-- Get the next value from a sequence:</span>
+<span class="p">SQL&gt;</span> <span class="k">SELECT</span> seq_customers.<span class="k">NEXTVAL FROM</span> DUAL;
+<span class="o">   NEXTVAL
+----------
+         1</span></pre>
+
+  <h4>Create a View in SQL*Plus</h4>
+  <pre><span class="p">SQL&gt;</span> <span class="k">CREATE OR REPLACE VIEW</span> CustomerOrderSummary <span class="k">AS</span>
+  2  <span class="k">SELECT</span> c.customer_id, c.name,
+  3         <span class="k">COUNT</span>(o.order_id) <span class="k">AS</span> orders_count,
+  4         <span class="k">NVL</span>(<span class="k">SUM</span>(o.total_amount), 0) <span class="k">AS</span> total_spent
+  5  <span class="k">FROM</span> Customers c
+  6  <span class="k">LEFT JOIN</span> Orders o <span class="k">ON</span> c.customer_id = o.customer_id
+  7  <span class="k">GROUP BY</span> c.customer_id, c.name;
+<span class="o">View created.</span></pre>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sec page-break">
+  <div class="sec-title"><span class="num">10</span> MySQL vs Oracle — Command Line Differences</div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Action</th><th>MySQL CLI</th><th>Oracle SQL*Plus</th></tr>
+      <tr class="diff-row">
+        <td>Connect</td>
+        <td><code>mysql -u root -p</code></td>
+        <td><code>sqlplus user/pass@host/XE</code></td>
+      </tr>
+      <tr class="diff-row">
+        <td>Show tables</td>
+        <td><code>SHOW TABLES;</code></td>
+        <td><code>SELECT table_name FROM user_tables;</code></td>
+      </tr>
+      <tr class="diff-row">
+        <td>Show columns</td>
+        <td><code>DESCRIBE tablename;</code></td>
+        <td><code>DESC tablename;</code> (same!)</td>
+      </tr>
+      <tr class="diff-row">
+        <td>Limit rows</td>
+        <td><code>SELECT * FROM t LIMIT 5;</code></td>
+        <td><code>SELECT * FROM t FETCH FIRST 5 ROWS ONLY;</code></td>
+      </tr>
+      <tr class="diff-row">
+        <td>Auto-commit</td>
+        <td>Yes (by default)</td>
+        <td>No — must type <code>COMMIT;</code></td>
+      </tr>
+      <tr class="diff-row">
+        <td>Current date</td>
+        <td><code>NOW()</code></td>
+        <td><code>SYSDATE</code></td>
+      </tr>
+      <tr class="diff-row">
+        <td>NULL fallback</td>
+        <td><code>COALESCE(x, 0)</code></td>
+        <td><code>NVL(x, 0)</code></td>
+      </tr>
+      <tr class="diff-row">
+        <td>Auto-increment</td>
+        <td><code>INT AUTO_INCREMENT</code></td>
+        <td>Sequence + Trigger</td>
+      </tr>
+      <tr class="diff-row">
+        <td>String type</td>
+        <td><code>VARCHAR(100)</code></td>
+        <td><code>VARCHAR2(100)</code></td>
+      </tr>
+      <tr class="diff-row">
+        <td>Set minus</td>
+        <td><code>EXCEPT</code></td>
+        <td><code>MINUS</code></td>
+      </tr>
+      <tr class="diff-row">
+        <td>Run PL/SQL block</td>
+        <td>N/A (different language)</td>
+        <td>End block with <code>/</code> on new line</td>
+      </tr>
+      <tr class="diff-row">
+        <td>Show databases</td>
+        <td><code>SHOW DATABASES;</code></td>
+        <td><code>SELECT * FROM v$database;</code></td>
+      </tr>
+      <tr class="diff-row">
+        <td>Exit</td>
+        <td><code>EXIT;</code> or <code>QUIT;</code></td>
+        <td><code>EXIT</code> or <code>QUIT</code> (no semicolon needed)</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sec">
+  <div class="sec-title"><span class="num">11</span> Common Errors & Fixes</div>
+
+  <div class="grid2">
+    <div>
+      <pre><span class="e">ORA-01017: invalid username/password
+logon denied</span></pre>
+      <div class="note dang"><strong>Fix:</strong> Wrong username or password. Check: <code>salehin_076923 / 2207045</code></div>
+    </div>
+    <div>
+      <pre><span class="e">ORA-12541: TNS:no listener</span></pre>
+      <div class="note dang"><strong>Fix:</strong> Oracle listener is not running. Start <code>OracleXETNSListener</code> service in Windows Services.</div>
+    </div>
+    <div>
+      <pre><span class="e">ORA-00942: table or view does not exist</span></pre>
+      <div class="note dang"><strong>Fix:</strong> Table doesn't exist yet. Run <code>init_db.php</code> first or check spelling.</div>
+    </div>
+    <div>
+      <pre><span class="e">ORA-02291: integrity constraint
+violated - parent key not found</span></pre>
+      <div class="note dang"><strong>Fix:</strong> Foreign key violation. Make sure the referenced row exists in the parent table first.</div>
+    </div>
+    <div>
+      <pre><span class="e">SP2-0042: unknown command ...
+rest of line ignored</span></pre>
+      <div class="note dang"><strong>Fix:</strong> You typed a SQL*Plus command incorrectly, or used MySQL syntax. Check the command spelling.</div>
+    </div>
+    <div>
+      <pre><span class="e">ORA-04091: table is mutating</span></pre>
+      <div class="note dang"><strong>Fix:</strong> Trigger reads its own table. Use <code>PRAGMA AUTONOMOUS_TRANSACTION</code> (already fixed in our project).</div>
+    </div>
+  </div>
+
+  <div class="note succ" style="margin-top:16px">
+    <strong>✅ Quick Reference Card</strong>
+    Connect: <code>sqlplus salehin_076923/2207045@localhost/XE</code> &nbsp;|&nbsp;
+    See tables: <code>SELECT table_name FROM user_tables;</code> &nbsp;|&nbsp;
+    Describe: <code>DESC Customers;</code> &nbsp;|&nbsp;
+    Save changes: <code>COMMIT;</code> &nbsp;|&nbsp;
+    Undo changes: <code>ROLLBACK;</code> &nbsp;|&nbsp;
+    Enable print: <code>SET SERVEROUTPUT ON;</code> &nbsp;|&nbsp;
+    Wider output: <code>SET LINESIZE 200;</code> &nbsp;|&nbsp;
+    Exit: <code>EXIT</code>
+  </div>
+
+  <div style="margin-top:32px;text-align:center;color:#475569;font-size:12px;border-top:1px solid #1e293b;padding-top:20px;">
+    <strong style="color:#e2e8f0">GrocerCart — Oracle SQL*Plus Command Reference</strong><br>
+    PHP 8.2 + Oracle XE 11g + OCI8 · Student: Nazmus Salehin Nirob · June 2026
+  </div>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GrocerCart – Full Project Explanation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #1e293b;
+    background: #f8fafc;
+  }
+
+  /* ── Print / PDF ── */
+  @media print {
+    body { background: white; font-size: 11px; }
+    .no-print { display: none !important; }
+    .page-break { page-break-before: always; }
+    .card { break-inside: avoid; }
+    header { background: #1e3a5f !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .badge, .tag, .code-block, .table-wrap, .highlight-box, .step { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Layout ── */
+  .container { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+
+  /* ── Header ── */
+  header {
+    background: linear-gradient(135deg, #0f2942 0%, #1e3a5f 50%, #0f4c81 100%);
+    color: white;
+    padding: 50px 40px;
+    margin-bottom: 40px;
+  }
+  header .logo { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+  header .logo-icon {
+    width: 56px; height: 56px;
+    background: #22c55e;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+  header h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; }
+  header .subtitle { font-size: 15px; color: #93c5fd; margin-top: 4px; }
+  header .meta { display:flex; gap:24px; margin-top:24px; flex-wrap:wrap; }
+  header .meta-item {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+  header .meta-item strong { color: #86efac; display:block; font-size:11px; letter-spacing:.5px; text-transform:uppercase; }
+
+  /* ── TOC ── */
+  .toc {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 36px;
+  }
+  .toc h2 { font-size: 16px; font-weight: 700; color: #0f4c81; margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 6px; color: #334155; }
+  .toc a { color: #0f4c81; text-decoration: none; font-weight: 500; }
+  .toc a:hover { text-decoration: underline; }
+
+  /* ── Section ── */
+  .section { margin-bottom: 48px; }
+  .section-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f2942;
+    border-left: 5px solid #22c55e;
+    padding-left: 14px;
+    margin-bottom: 20px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .section-num {
+    background: #0f4c81;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-right: 8px;
+    letter-spacing: .5px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 22px 26px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .card-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .card-title { font-size: 15px; font-weight: 700; color: #0f2942; }
+  .card-filename {
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 2px 8px;
+    border-radius: 5px;
+  }
+
+  /* ── Colours ── */
+  .blue  { background: #eff6ff; } .blue  .card-icon { background:#dbeafe; color:#1d4ed8; }
+  .green { background: #f0fdf4; } .green .card-icon { background:#dcfce7; color:#16a34a; }
+  .purple{ background: #faf5ff; } .purple .card-icon { background:#ede9fe; color:#7c3aed; }
+  .orange{ background: #fff7ed; } .orange .card-icon { background:#ffedd5; color:#ea580c; }
+  .red   { background: #fff1f2; } .red   .card-icon { background:#ffe4e6; color:#dc2626; }
+  .indigo{ background: #eef2ff; } .indigo .card-icon { background:#e0e7ff; color:#4338ca; }
+  .teal  { background: #f0fdfa; } .teal  .card-icon { background:#ccfbf1; color:#0d9488; }
+  .gray  { background: #f8fafc; } .gray  .card-icon { background:#e2e8f0; color:#475569; }
+
+  /* ── Code blocks ── */
+  .code-block {
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: 'Fira Code', monospace;
+    font-size: 11.5px;
+    line-height: 1.7;
+    padding: 16px 20px;
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 10px 0;
+    border-left: 4px solid #3b82f6;
+  }
+  .code-block .c  { color: #64748b; }   /* comment */
+  .code-block .k  { color: #93c5fd; }   /* keyword */
+  .code-block .s  { color: #86efac; }   /* string */
+  .code-block .f  { color: #fde68a; }   /* function */
+  .code-block .v  { color: #f9a8d4; }   /* variable */
+  .code-block .sql{ color: #67e8f9; }   /* SQL keyword */
+
+  /* ── Highlight boxes ── */
+  .highlight-box {
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 12px 0;
+    font-size: 12.5px;
+  }
+  .info    { background:#eff6ff; border-left:4px solid #3b82f6; color:#1e40af; }
+  .success { background:#f0fdf4; border-left:4px solid #22c55e; color:#166534; }
+  .warning { background:#fffbeb; border-left:4px solid #f59e0b; color:#92400e; }
+  .danger  { background:#fff1f2; border-left:4px solid #ef4444; color:#991b1b; }
+
+  .highlight-box strong { font-weight: 700; display:block; margin-bottom:3px; }
+
+  /* ── Steps ── */
+  .steps { counter-reset: step; }
+  .step {
+    display: flex; gap: 14px; margin-bottom: 14px;
+    background: white; border:1px solid #e2e8f0;
+    border-radius: 12px; padding: 14px 18px;
+    align-items: flex-start;
+  }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #0f4c81; color: white;
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .step-content strong { color: #0f2942; display:block; margin-bottom:2px; }
+
+  /* ── Table ── */
+  .table-wrap { overflow-x: auto; margin: 12px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th {
+    background: #0f2942; color: white;
+    padding: 10px 14px; text-align: left;
+    font-size: 11px; letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  tr:hover td { background: #eff6ff; }
+
+  /* ── Tags / Badges ── */
+  .badge {
+    display: inline-block;
+    font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 20px;
+    margin: 2px;
+  }
+  .badge-blue   { background:#dbeafe; color:#1d4ed8; }
+  .badge-green  { background:#dcfce7; color:#166534; }
+  .badge-orange { background:#ffedd5; color:#c2410c; }
+  .badge-red    { background:#fee2e2; color:#991b1b; }
+  .badge-purple { background:#ede9fe; color:#6d28d9; }
+  .badge-gray   { background:#f1f5f9; color:#475569; }
+
+  .tag {
+    font-family: 'Fira Code', monospace;
+    background: #0f172a; color: #67e8f9;
+    font-size: 11px; padding: 1px 7px;
+    border-radius: 5px;
+  }
+
+  /* ── Diagram ── */
+  .diagram {
+    background: #0f172a;
+    border-radius: 14px;
+    padding: 28px;
+    color: #e2e8f0;
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+    line-height: 2.2;
+    text-align: center;
+  }
+  .diagram .box {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    margin: 4px;
+  }
+  .diagram .browser { background:#1d4ed8; }
+  .diagram .php     { background:#7c3aed; }
+  .diagram .oracle  { background:#c2410c; }
+  .diagram .arrow   { color:#6b7280; }
+  .diagram .label   { color:#94a3b8; font-size:10px; display:block; }
+
+  /* ── Flow chart ASCII ── */
+  .flow {
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 20px;
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+    line-height: 1.9;
+    color: #334155;
+  }
+
+  /* ── File tree ── */
+  .tree {
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+    line-height: 1.9;
+    padding: 20px 24px;
+    border-radius: 12px;
+  }
+  .tree .dir  { color: #93c5fd; font-weight: 600; }
+  .tree .file { color: #86efac; }
+  .tree .note { color: #64748b; font-size: 11px; }
+
+  /* ── Print button ── */
+  .print-btn {
+    position: fixed; bottom: 30px; right: 30px;
+    background: #0f4c81; color: white;
+    border: none; border-radius: 50px;
+    padding: 14px 28px; font-size: 14px; font-weight: 600;
+    cursor: pointer; box-shadow: 0 8px 24px rgba(15,76,129,.4);
+    display: flex; align-items: center; gap: 8px;
+    transition: all .2s;
+    font-family: 'Inter', sans-serif;
+  }
+  .print-btn:hover { background: #1d4ed8; transform: translateY(-2px); }
+
+  p { margin-bottom: 10px; }
+  ul, ol { padding-left: 20px; margin-bottom: 10px; }
+  li { margin-bottom: 5px; }
+  h3 { font-size: 14px; font-weight: 700; color: #0f2942; margin: 16px 0 8px; }
+  hr { border: none; border-top: 1px solid #e2e8f0; margin: 32px 0; }
+</style>
+</head>
+<body>
+
+<!-- PRINT BUTTON -->
+<button class="print-btn no-print" onclick="window.print()">
+  🖨️ Save as PDF (Ctrl+P)
+</button>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🛒</div>
+    <div>
+      <h1>GrocerCart – Complete Project Explanation</h1>
+      <div class="subtitle">PHP + Oracle XE 11g Database System — Beginner's Guide</div>
+    </div>
+  </div>
+  <div class="meta">
+    <div class="meta-item"><strong>Student</strong>Nazmus Salehin Nirob</div>
+    <div class="meta-item"><strong>Oracle User</strong>salehin_076923 @ localhost/XE</div>
+    <div class="meta-item"><strong>Technology</strong>PHP 8.2 + OCI8 + Oracle XE 11g</div>
+    <div class="meta-item"><strong>PHP Location</strong>C:\xampp\htdocs\GrocerCart\</div>
+    <div class="meta-item"><strong>Course</strong>Database Systems Lab</div>
+    <div class="meta-item"><strong>Date</strong>June 2026</div>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+  <h2>📋 Table of Contents</h2>
+  <ol>
+    <li><a href="#s1">What is GrocerCart?</a></li>
+    <li><a href="#s2">How the Project is Structured (File Tree)</a></li>
+    <li><a href="#s3">How PHP Talks to Oracle — The Big Picture</a></li>
+    <li><a href="#s4">Database Layer — Oracle Tables, Sequences & Triggers</a></li>
+    <li><a href="#s5">The Core Engine — db.php (Database Connection)</a></li>
+    <li><a href="#s6">Setup File — init_db.php (Create Tables & Data)</a></li>
+    <li><a href="#s7">Frontend — index.php (Dashboard)</a></li>
+    <li><a href="#s8">CRUD Pages — Customers, Vendors, Products, Orders</a></li>
+    <li><a href="#s9">SQL Operations Showcase — sql_ops.php</a></li>
+    <li><a href="#s10">Summary of All Oracle SQL Concepts Used</a></li>
+    <li><a href="#s11">How to Run the Project</a></li>
+    <li><a href="#s12">Key Differences — MySQL vs Oracle</a></li>
+  </ol>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="s1">
+  <div class="section-title"><span class="section-num">1</span> What is GrocerCart?</div>
+
+  <div class="card gray">
+    <p><strong>GrocerCart</strong> is a <em>Grocery Management System</em> — a web application that allows an admin (your teacher) to manage an online grocery store. It is built using:</p>
+    <ul>
+      <li><strong>PHP</strong> — the programming language that runs on the server and generates web pages</li>
+      <li><strong>Oracle XE 11g</strong> — the database that stores all data (customers, products, orders, etc.)</li>
+      <li><strong>HTML + Tailwind CSS</strong> — the frontend design that you see in the browser</li>
+      <li><strong>OCI8</strong> — the PHP extension (plugin) that lets PHP communicate with Oracle</li>
+      <li><strong>XAMPP / Apache</strong> — the web server that hosts the PHP files locally</li>
+    </ul>
+    <div class="highlight-box success">
+      <strong>💡 Simple Analogy</strong>
+      Think of it like a restaurant: <strong>Oracle</strong> is the kitchen (stores all the data), <strong>PHP</strong> is the waiter (fetches data and prepares web pages), and <strong>your browser</strong> is the customer (sees the final result).
+    </div>
+  </div>
+
+  <h3>🗃️ What Data Does the System Manage?</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Table</th><th>What it stores</th><th>Real-world example</th></tr>
+      <tr><td><span class="tag">Customers</span></td><td>People who buy groceries</td><td>Alice Green, Bob Brown…</td></tr>
+      <tr><td><span class="tag">Vendors</span></td><td>Suppliers who provide products</td><td>Fresh Farms, Eco Produce…</td></tr>
+      <tr><td><span class="tag">Products</span></td><td>Grocery items for sale</td><td>Organic Apple $0.99, Kale $2.50…</td></tr>
+      <tr><td><span class="tag">Orders</span></td><td>A customer's purchase request</td><td>Order #1 by Alice, total $43.97…</td></tr>
+      <tr><td><span class="tag">Order_Details</span></td><td>Which products are in each order</td><td>Order #1 has 10x Brown Rice…</td></tr>
+      <tr><td><span class="tag">Delivery</span></td><td>Shipping info for each order</td><td>Order #1 → Standard shipping, scheduled…</td></tr>
+    </table>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section page-break" id="s2">
+  <div class="section-title"><span class="section-num">2</span> How the Project is Structured (File Tree)</div>
+
+  <div class="tree">
+    <span class="dir">C:\xampp\htdocs\GrocerCart\</span>         <span class="note">← Your project folder (served by XAMPP Apache)</span>
+    │
+    ├── <span class="file">db.php</span>                          <span class="note">← ⭐ THE ENGINE — Oracle connection + helper functions</span>
+    ├── <span class="file">init_db.php</span>                     <span class="note">← Run ONCE — creates all Oracle tables, triggers, data</span>
+    ├── <span class="file">index.php</span>                       <span class="note">← Dashboard (home page)</span>
+    │
+    ├── <span class="file">customers_list.php</span>              <span class="note">← Show all customers (SELECT)</span>
+    ├── <span class="file">customers_form.php</span>              <span class="note">← Add / Edit a customer (INSERT / UPDATE)</span>
+    ├── <span class="file">customers_delete.php</span>            <span class="note">← Delete a customer (DELETE)</span>
+    │
+    ├── <span class="file">vendors_list.php</span>                <span class="note">← Show all vendors</span>
+    ├── <span class="file">vendors_form.php</span>                <span class="note">← Add / Edit a vendor</span>
+    ├── <span class="file">vendors_delete.php</span>              <span class="note">← Delete a vendor</span>
+    │
+    ├── <span class="file">products_list.php</span>               <span class="note">← Show all products (with vendor name via JOIN)</span>
+    ├── <span class="file">products_form.php</span>               <span class="note">← Add / Edit a product</span>
+    ├── <span class="file">products_delete.php</span>             <span class="note">← Delete a product</span>
+    │
+    ├── <span class="file">orders_list.php</span>                 <span class="note">← Show all orders (with customer name via JOIN)</span>
+    ├── <span class="file">orders_form.php</span>                 <span class="note">← Add / Edit an order</span>
+    ├── <span class="file">orders_delete.php</span>               <span class="note">← Delete an order</span>
+    │
+    ├── <span class="file">order_details_list.php</span>          <span class="note">← Show order items (3-table JOIN)</span>
+    ├── <span class="file">order_details_form.php</span>          <span class="note">← Add / Edit an order item</span>
+    ├── <span class="file">order_details_delete.php</span>        <span class="note">← Delete an order item</span>
+    │
+    ├── <span class="file">delivery_list.php</span>               <span class="note">← Show delivery records</span>
+    ├── <span class="file">delivery_form.php</span>               <span class="note">← Add / Edit a delivery</span>
+    ├── <span class="file">delivery_delete.php</span>             <span class="note">← Delete a delivery record</span>
+    │
+    └── <span class="file">sql_ops.php</span>                     <span class="note">← SQL Operations showcase (JOINs, Subqueries, etc.)</span>
+  </div>
+
+  <div class="highlight-box info" style="margin-top:14px">
+    <strong>📌 Pattern to Remember</strong>
+    Every database entity (Customers, Vendors, Products…) has exactly <strong>3 PHP files</strong>:
+    <code>_list.php</code> (Read/View), <code>_form.php</code> (Create/Edit), <code>_delete.php</code> (Delete).
+    This pattern is called <strong>CRUD</strong> = Create, Read, Update, Delete.
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section page-break" id="s3">
+  <div class="section-title"><span class="section-num">3</span> How PHP Talks to Oracle — The Big Picture</div>
+
+  <div class="diagram">
+    <div>
+      <span class="box browser">🌐 Your Browser</span>
+      <span class="arrow"> ──── HTTP Request ────▶ </span>
+      <span class="box php">⚙️ PHP File (Apache/XAMPP)</span>
+    </div>
+    <span class="label">User visits http://localhost/GrocerCart/index.php</span>
+    <br>
+    <div>
+      <span class="box php">⚙️ PHP (db.php)</span>
+      <span class="arrow"> ──── OCI8 Extension ────▶ </span>
+      <span class="box oracle">🗄️ Oracle XE (Port 1521)</span>
+    </div>
+    <span class="label">oci_connect('salehin_076923', '2207045', 'localhost/XE')</span>
+    <br>
+    <div>
+      <span class="box oracle">🗄️ Oracle runs SQL</span>
+      <span class="arrow"> ──── Returns Data ────▶ </span>
+      <span class="box php">⚙️ PHP builds HTML</span>
+    </div>
+    <span class="label">SELECT * FROM Customers → PHP loops through rows → HTML table</span>
+    <br>
+    <div>
+      <span class="box php">⚙️ PHP sends HTML</span>
+      <span class="arrow"> ──── HTTP Response ────▶ </span>
+      <span class="box browser">🌐 Browser displays page</span>
+    </div>
+    <span class="label">You see the styled web page with real data from Oracle</span>
+  </div>
+
+  <h3>🔑 What is OCI8?</h3>
+  <div class="card gray">
+    <p><strong>OCI8</strong> (Oracle Call Interface 8) is a PHP <em>extension</em> — think of it as a translator between PHP and Oracle. Without it, PHP has no idea how to speak Oracle's language. In your XAMPP setup, it is already installed and enabled (we verified this earlier).</p>
+    <div class="highlight-box warning">
+      <strong>⚠️ Why not use MySQL's PDO?</strong>
+      The original GreenCart project used MySQL with <code>PDO</code> (PHP Data Objects). Oracle requires a different connector: <code>oci_connect()</code>, <code>oci_parse()</code>, <code>oci_execute()</code> etc. These are the OCI8 functions. We replaced every MySQL/PDO call with OCI8 equivalents.
+    </div>
+  </div>
+
+  <h3>🔐 Connection Credentials</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Setting</th><th>Value</th><th>What it means</th></tr>
+      <tr><td>Username</td><td><span class="tag">salehin_076923</span></td><td>Your Oracle schema/user — all tables are stored under this user</td></tr>
+      <tr><td>Password</td><td><span class="tag">2207045</span></td><td>Oracle password for that user</td></tr>
+      <tr><td>Connection String</td><td><span class="tag">localhost/XE</span></td><td>localhost = this PC, XE = Oracle Express Edition service name</td></tr>
+      <tr><td>Port</td><td><span class="tag">1521</span></td><td>The port Oracle's listener runs on (default)</td></tr>
+      <tr><td>Charset</td><td><span class="tag">AL32UTF8</span></td><td>Unicode encoding so special characters work correctly</td></tr>
+    </table>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section page-break" id="s4">
+  <div class="section-title"><span class="section-num">4</span> Database Layer — Oracle Tables, Sequences & Triggers</div>
+
+  <h3>📐 Entity Relationship — How Tables Are Connected</h3>
+  <div class="flow">
+Customers (customer_id PK)
+     │
+     │ 1 customer can have many orders
+     ▼
+  Orders (order_id PK, customer_id FK → Customers)
+     │
+     │ 1 order can have many order line items
+     ▼
+  Order_Details (order_detail_id PK, order_id FK → Orders, product_id FK → Products)
+     │
+Products (product_id PK, vendor_id FK → Vendors)
+     │
+     │ 1 vendor can supply many products
+     ▼
+  Vendors (vendor_id PK)
+
+Delivery (delivery_id PK, order_id FK → Orders)
+     └── 1 order has 1 delivery record
+  </div>
+
+  <h3>🔢 What is a Sequence? (Oracle's Auto-Increment)</h3>
+  <div class="card green">
+    <p>In MySQL you write <code>INT AUTO_INCREMENT</code> and the ID increases automatically. Oracle does NOT have AUTO_INCREMENT. Instead we use a <strong>Sequence</strong>.</p>
+    <p>A Sequence is like a counter that Oracle keeps. Every time you insert a new row, the counter gives the next number.</p>
+    <div class="code-block">
+<span class="c">-- Create a sequence (counter starting at 1)</span>
+<span class="sql">CREATE SEQUENCE</span> seq_customers <span class="sql">START WITH</span> 1 <span class="sql">INCREMENT BY</span> 1;
+
+<span class="c">-- Use the sequence to get the next ID</span>
+<span class="sql">SELECT</span> seq_customers.<span class="f">NEXTVAL</span> <span class="sql">FROM</span> DUAL;  <span class="c">-- returns 1, then 2, then 3...</span>
+    </div>
+    <p>We created 6 sequences — one for each table: <span class="badge badge-green">seq_customers</span> <span class="badge badge-green">seq_vendors</span> <span class="badge badge-green">seq_products</span> <span class="badge badge-green">seq_orders</span> <span class="badge badge-green">seq_order_details</span> <span class="badge badge-green">seq_delivery</span></p>
+  </div>
+
+  <h3>⚡ What is a Trigger?</h3>
+  <div class="card orange">
+    <p>A <strong>Trigger</strong> is a block of code that Oracle automatically runs when something happens to a table (before/after insert, update, delete). You don't call it — Oracle fires it automatically.</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Trigger Name</th><th>When it Fires</th><th>What it Does</th></tr>
+        <tr><td><span class="tag">trg_customers_bi</span></td><td>BEFORE INSERT on Customers</td><td>Gets next ID from seq_customers sequence (auto-increment)</td></tr>
+        <tr><td><span class="tag">trg_vendors_bi</span></td><td>BEFORE INSERT on Vendors</td><td>Gets next ID from seq_vendors</td></tr>
+        <tr><td><span class="tag">trg_products_bi</span></td><td>BEFORE INSERT on Products</td><td>Gets next ID from seq_products</td></tr>
+        <tr><td><span class="tag">trg_orders_bi</span></td><td>BEFORE INSERT on Orders</td><td>Gets next ID from seq_orders</td></tr>
+        <tr><td><span class="tag">trg_order_details_bi</span></td><td>BEFORE INSERT on Order_Details</td><td>Gets next ID from seq_order_details</td></tr>
+        <tr><td><span class="tag">trg_delivery_bi</span></td><td>BEFORE INSERT on Delivery</td><td>Gets next ID from seq_delivery</td></tr>
+        <tr><td><span class="tag">trg_calc_subtotal</span></td><td>BEFORE INSERT on Order_Details</td><td>Automatically calculates subtotal = price × quantity</td></tr>
+        <tr><td><span class="tag">trg_update_order_total</span></td><td>AFTER INSERT on Order_Details</td><td>Updates the order's total_amount by summing all subtotals</td></tr>
+        <tr><td><span class="tag">trg_loyalty_points</span></td><td>AFTER UPDATE on Orders</td><td>Awards loyalty points to customer when order is delivered</td></tr>
+        <tr><td><span class="tag">trg_check_price</span></td><td>BEFORE INSERT/UPDATE on Products</td><td>Rejects insert if price is negative (data validation)</td></tr>
+      </table>
+    </div>
+    <div class="code-block">
+<span class="c">-- Example: trg_calc_subtotal fires before every Order_Detail insert</span>
+<span class="sql">CREATE OR REPLACE TRIGGER</span> trg_calc_subtotal
+<span class="sql">BEFORE INSERT ON</span> Order_Details
+<span class="sql">FOR EACH ROW</span>             <span class="c">-- runs for every row being inserted</span>
+<span class="k">DECLARE</span>
+    v_price Products.price<span class="f">%TYPE</span>;  <span class="c">-- variable to hold the price</span>
+<span class="k">BEGIN</span>
+    <span class="c">-- look up the price from Products table</span>
+    <span class="sql">SELECT</span> price <span class="sql">INTO</span> v_price <span class="sql">FROM</span> Products
+    <span class="sql">WHERE</span> product_id = <span class="v">:NEW</span>.product_id;
+
+    <span class="c">-- automatically set subtotal = price × quantity</span>
+    <span class="v">:NEW</span>.subtotal := v_price * <span class="v">:NEW</span>.quantity;
+<span class="k">END</span>;
+<span class="c">-- :NEW means "the row being inserted right now"</span>
+    </div>
+  </div>
+
+  <h3>👁️ What is a View?</h3>
+  <div class="card blue">
+    <p>A <strong>View</strong> is a saved SQL query that acts like a virtual table. Instead of writing a complex JOIN every time, you just query the view.</p>
+    <div class="code-block">
+<span class="c">-- Create a view (saved query)</span>
+<span class="sql">CREATE OR REPLACE VIEW</span> CustomerOrderSummary <span class="sql">AS</span>
+<span class="sql">SELECT</span> c.customer_id, c.name, c.email,
+       <span class="f">COUNT</span>(o.order_id) <span class="sql">AS</span> orders_count,
+       <span class="f">NVL</span>(<span class="f">SUM</span>(o.total_amount), 0) <span class="sql">AS</span> total_spent
+<span class="sql">FROM</span> Customers c
+<span class="sql">LEFT JOIN</span> Orders o <span class="sql">ON</span> c.customer_id = o.customer_id
+<span class="sql">GROUP BY</span> c.customer_id, c.name, c.email;
+
+<span class="c">-- Use it like a normal table</span>
+<span class="sql">SELECT</span> * <span class="sql">FROM</span> CustomerOrderSummary <span class="sql">ORDER BY</span> total_spent <span class="sql">DESC</span>;
+    </div>
+  </div>
+
+  <h3>📦 What is a Stored Procedure?</h3>
+  <div class="card purple">
+    <p>A <strong>Stored Procedure</strong> is a named, reusable block of PL/SQL code stored inside Oracle. It can accept input parameters and return output parameters.</p>
+    <div class="code-block">
+<span class="c">-- Procedure: given a product name, return vendor name and category</span>
+<span class="sql">CREATE OR REPLACE PROCEDURE</span> get_product_details(
+    p_product_name  <span class="sql">IN</span>  Products.name<span class="f">%TYPE</span>,    <span class="c">-- INPUT</span>
+    p_vendor_name   <span class="sql">OUT</span> Vendors.vendor_name<span class="f">%TYPE</span>, <span class="c">-- OUTPUT</span>
+    p_category      <span class="sql">OUT</span> Products.category<span class="f">%TYPE</span>    <span class="c">-- OUTPUT</span>
+) <span class="sql">AS</span>
+<span class="k">BEGIN</span>
+    <span class="sql">SELECT</span> v.vendor_name, p.category
+    <span class="sql">INTO</span>   p_vendor_name, p_category
+    <span class="sql">FROM</span>   Products p
+    <span class="sql">LEFT JOIN</span> Vendors v <span class="sql">ON</span> p.vendor_id = v.vendor_id
+    <span class="sql">WHERE</span>  p.name = p_product_name <span class="sql">AND ROWNUM</span> = 1;
+<span class="k">END</span>;
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section page-break" id="s5">
+  <div class="section-title"><span class="section-num">5</span> The Core Engine — db.php (Database Connection)</div>
+
+  <div class="card teal">
+    <div class="card-header">
+      <div class="card-icon" style="background:#ccfbf1;color:#0d9488;">🔌</div>
+      <div>
+        <div class="card-title">db.php — The Foundation of the Entire Project</div>
+        <div class="card-filename">C:\xampp\htdocs\GrocerCart\db.php</div>
+      </div>
+    </div>
+    <p>This is the most important file. <strong>Every other PHP file starts with <code>require_once 'db.php'</code></strong> — this loads the database connection and all helper functions before anything else runs. If you change the Oracle password, you only change it here.</p>
+  </div>
+
+  <h3>Part 1 — Connection Constants</h3>
+  <div class="code-block">
+<span class="c">// These 3 lines define HOW to connect to Oracle</span>
+<span class="f">define</span>(<span class="s">'OCI_USER'</span>,    <span class="s">'salehin_076923'</span>);  <span class="c">// Oracle username</span>
+<span class="f">define</span>(<span class="s">'OCI_PASS'</span>,    <span class="s">'2207045'</span>);         <span class="c">// Oracle password</span>
+<span class="f">define</span>(<span class="s">'OCI_CONNSTR'</span>, <span class="s">'localhost/XE'</span>);    <span class="c">// host/service_name</span>
+  </div>
+  <div class="highlight-box info">
+    <strong>Why define() instead of variables?</strong>
+    Constants (defined with <code>define()</code>) cannot be accidentally changed anywhere in the code. Variables could be overwritten. This makes credentials safer.
+  </div>
+
+  <h3>Part 2 — getOCI() — The Connection Function</h3>
+  <div class="code-block">
+<span class="k">function</span> <span class="f">getOCI</span>(): mixed {
+    <span class="k">static</span> <span class="v">$conn</span> = <span class="k">null</span>;        <span class="c">// static = remembered between calls</span>
+    <span class="k">if</span> (<span class="v">$conn</span> === <span class="k">null</span>) {
+        <span class="c">// oci_connect() is the OCI8 function to open Oracle connection</span>
+        <span class="v">$conn</span> = <span class="f">@oci_connect</span>(OCI_USER, OCI_PASS, OCI_CONNSTR, <span class="s">'AL32UTF8'</span>);
+        <span class="k">if</span> (!<span class="v">$conn</span>) {
+            <span class="v">$e</span> = <span class="f">oci_error</span>();
+            <span class="f">die</span>(<span class="s">'Connection Failed: '</span> . <span class="v">$e</span>[<span class="s">'message'</span>]);
+        }
+    }
+    <span class="k">return</span> <span class="v">$conn</span>;  <span class="c">// returns the live connection resource</span>
+}
+  </div>
+  <p><strong>Key point:</strong> <code>static $conn</code> means the connection is created only <em>once</em> per page load and reused. This avoids opening a new Oracle connection for every query (which would be slow).</p>
+
+  <h3>Part 3 — ociQuery() — Run SELECT and Get Results</h3>
+  <div class="code-block">
+<span class="k">function</span> <span class="f">ociQuery</span>(string <span class="v">$sql</span>, array <span class="v">$binds</span> = []): array {
+    <span class="v">$conn</span>  = <span class="f">getOCI</span>();                    <span class="c">// get the connection</span>
+    <span class="v">$stmt</span>  = <span class="f">oci_parse</span>(<span class="v">$conn</span>, <span class="v">$sql</span>);    <span class="c">// prepare the SQL (check syntax)</span>
+    <span class="k">foreach</span> (<span class="v">$binds</span> <span class="k">as</span> <span class="v">$key</span> => <span class="v">$val</span>) {
+        <span class="f">oci_bind_by_name</span>(<span class="v">$stmt</span>, <span class="v">$key</span>, <span class="v">$binds</span>[<span class="v">$key</span>]); <span class="c">// safely bind variables</span>
+    }
+    <span class="f">oci_execute</span>(<span class="v">$stmt</span>, OCI_DEFAULT);     <span class="c">// run the SQL</span>
+    <span class="v">$rows</span> = [];
+    <span class="k">while</span> (<span class="v">$row</span> = <span class="f">oci_fetch_assoc</span>(<span class="v">$stmt</span>)) { <span class="c">// fetch each row</span>
+        <span class="v">$rows</span>[] = <span class="f">array_change_key_case</span>(<span class="v">$row</span>, CASE_LOWER); <span class="c">// lowercase column names</span>
+    }
+    <span class="f">oci_free_statement</span>(<span class="v">$stmt</span>);           <span class="c">// free memory</span>
+    <span class="k">return</span> <span class="v">$rows</span>;                         <span class="c">// return array of rows</span>
+}
+  </div>
+
+  <h3>Part 4 — ociExec() — Run INSERT / UPDATE / DELETE</h3>
+  <div class="code-block">
+<span class="k">function</span> <span class="f">ociExec</span>(string <span class="v">$sql</span>, array <span class="v">$binds</span> = []): bool {
+    <span class="v">$conn</span> = <span class="f">getOCI</span>();
+    <span class="v">$stmt</span> = <span class="f">oci_parse</span>(<span class="v">$conn</span>, <span class="v">$sql</span>);
+    <span class="k">foreach</span> (<span class="v">$binds</span> <span class="k">as</span> <span class="v">$key</span> => <span class="v">$val</span>) {
+        <span class="f">oci_bind_by_name</span>(<span class="v">$stmt</span>, <span class="v">$key</span>, <span class="v">$binds</span>[<span class="v">$key</span>]);
+    }
+    <span class="v">$ok</span> = <span class="f">oci_execute</span>(<span class="v">$stmt</span>, OCI_NO_AUTO_COMMIT); <span class="c">// don't auto-commit yet</span>
+    <span class="k">if</span> (!<span class="v">$ok</span>) { <span class="k">throw new</span> RuntimeException(<span class="s">'OCI Error'</span>); }
+    <span class="f">oci_commit</span>(<span class="v">$conn</span>);                   <span class="c">// ← COMMIT saves the change permanently</span>
+    <span class="f">oci_free_statement</span>(<span class="v">$stmt</span>);
+    <span class="k">return true</span>;
+}
+  </div>
+  <div class="highlight-box warning">
+    <strong>🔒 What is oci_bind_by_name()?</strong>
+    Instead of directly putting user input into SQL (which could allow SQL Injection attacks), we use <strong>bind variables</strong> like <code>:name</code>, <code>:email</code>. Oracle treats these as data, never as code. This is the secure way to write database applications.
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section page-break" id="s6">
+  <div class="section-title"><span class="section-num">6</span> Setup File — init_db.php (Create Tables & Data)</div>
+
+  <div class="card orange">
+    <div class="card-header">
+      <div class="card-icon" style="background:#ffedd5;color:#ea580c;">⚙️</div>
+      <div>
+        <div class="card-title">init_db.php — Run This ONCE to Set Up Oracle</div>
+        <div class="card-filename">http://localhost/GrocerCart/init_db.php</div>
+      </div>
+    </div>
+    <p>This file is the <strong>database setup script</strong>. You run it one time in your browser. It automatically creates everything in Oracle: sequences, tables, constraints, triggers, view, stored procedure, and inserts 6 sample rows in each table.</p>
+  </div>
+
+  <h3>What init_db.php Does — Step by Step</h3>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-content"><strong>Drops old objects (if ?reset=1 in URL)</strong> Deletes all triggers, views, procedures, tables and sequences so you can start fresh.</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Creates 6 Sequences</strong> seq_customers, seq_vendors, seq_products, seq_orders, seq_order_details, seq_delivery — these replace MySQL's AUTO_INCREMENT.</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Creates 6 Tables</strong> Customers, Vendors, Products, Orders, Order_Details, Delivery — with PRIMARY KEY, FOREIGN KEY, CHECK, NOT NULL, UNIQUE constraints.</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Creates 10 Triggers</strong> 6 for auto-increment (BI triggers) + 4 business logic triggers (subtotal, order total, loyalty points, price validation).</div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Creates the View</strong> CustomerOrderSummary — a saved SELECT + LEFT JOIN + GROUP BY query.</div></div>
+    <div class="step"><div class="step-num">6</div><div class="step-content"><strong>Creates the Stored Procedure</strong> get_product_details — takes product name, returns vendor name and category via OUT parameters.</div></div>
+    <div class="step"><div class="step-num">7</div><div class="step-content"><strong>Inserts Sample Data</strong> 6 customers, 6 vendors, 6 products, 6 orders, 9 order details, 6 delivery records. Also marks 4 orders as "delivered" to trigger loyalty points.</div></div>
+  </div>
+
+  <div class="highlight-box success">
+    <strong>✅ After Running init_db.php</strong>
+    You will see a green log of every step. All 6 tables will have data visible in Oracle SQL Developer under your schema <code>salehin_076923</code>.
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section page-break" id="s7">
+  <div class="section-title"><span class="section-num">7</span> Frontend — index.php (Dashboard)</div>
+
+  <div class="card blue">
+    <div class="card-header">
+      <div class="card-icon" style="background:#dbeafe;color:#1d4ed8;">📊</div>
+      <div>
+        <div class="card-title">index.php — The Dashboard / Home Page</div>
+        <div class="card-filename">http://localhost/GrocerCart/index.php</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>How index.php Works — The PHP Part</h3>
+  <div class="code-block">
+<span class="c">// Step 1: Load db.php (connection + helpers)</span>
+<span class="f">require_once</span> <span class="s">'db.php'</span>;
+
+<span class="c">// Step 2: Run Oracle queries to collect dashboard stats</span>
+<span class="v">$stats</span>[<span class="s">'customers'</span>] = <span class="f">dashStat</span>(<span class="s">'Total Customers'</span>, <span class="s">'SELECT COUNT(*) total FROM Customers'</span>);
+<span class="v">$stats</span>[<span class="s">'revenue'</span>]   = <span class="f">dashStat</span>(<span class="s">'Total Revenue'</span>,
+                         <span class="s">"SELECT NVL(SUM(total_amount),0) total FROM Orders WHERE status &lt;&gt; 'cancelled'"</span>);
+
+<span class="c">// Step 3: Run complex JOIN queries for tables</span>
+<span class="v">$top_products</span> = <span class="f">ociQuery</span>(<span class="s">"SELECT p.name, SUM(od.quantity) AS total_sold
+                            FROM Products p
+                            LEFT JOIN Order_Details od ON p.product_id = od.product_id
+                            GROUP BY p.product_id, p.name
+                            ORDER BY total_sold DESC
+                            FETCH FIRST 5 ROWS ONLY"</span>);
+
+<span class="c">// Step 4: Generate HTML (the page is built here)</span>
+<span class="k">echo</span> <span class="f">getHeader</span>(<span class="s">'Dashboard'</span>);  <span class="c">// from db.php — outputs &lt;html&gt;&lt;head&gt;...</span>
+<span class="k">echo</span> <span class="f">getNav</span>();               <span class="c">// from db.php — outputs navigation bar</span>
+<span class="c">// ... HTML with PHP echo statements for data ...</span>
+<span class="k">echo</span> <span class="f">getFooter</span>();            <span class="c">// from db.php — closes &lt;/body&gt;&lt;/html&gt;</span>
+  </div>
+
+  <h3>What the Dashboard Shows</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Section</th><th>Oracle SQL Used</th><th>What It Shows</th></tr>
+      <tr><td>Stats Cards (8 cards)</td><td>COUNT(*), SUM(), AVG()</td><td>Total customers, revenue, orders, avg order value…</td></tr>
+      <tr><td>Top 5 Products</td><td>LEFT JOIN + GROUP BY + ORDER BY + FETCH FIRST 5</td><td>Best selling products with revenue</td></tr>
+      <tr><td>Top Vendors</td><td>Multiple LEFT JOINs + GROUP BY</td><td>Vendor performance ranking</td></tr>
+      <tr><td>Recent Orders</td><td>INNER JOIN + COUNT + ORDER BY + FETCH FIRST 5</td><td>Last 5 orders with customer name and status</td></tr>
+      <tr><td>SQL tooltip on hover</td><td>N/A</td><td>Shows the raw SQL query when you hover over cards</td></tr>
+    </table>
+  </div>
+
+  <h3>Where is the Frontend Code?</h3>
+  <div class="highlight-box info">
+    <strong>🎨 There is no separate CSS/JS file for most pages!</strong>
+    The styling uses <strong>Tailwind CSS</strong> loaded from a CDN (internet). The HTML and CSS are written directly inside the PHP files using <code>echo</code> statements. This is called <em>server-side rendering</em> — the PHP file generates the complete HTML page.
+  </div>
+
+  <div class="code-block">
+<span class="c">&lt;!-- Example: a stat card in index.php --&gt;</span>
+&lt;div class=<span class="s">"bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-5 text-white"</span>&gt;
+    &lt;p&gt;Revenue&lt;/p&gt;
+    &lt;p class=<span class="s">"text-3xl font-extrabold"</span>&gt;
+        $&lt;?= <span class="f">number_format</span>(<span class="v">$stats</span>[<span class="s">'revenue'</span>], 2) ?&gt;  <span class="c">&lt;!-- PHP prints the Oracle data --&gt;</span>
+    &lt;/p&gt;
+&lt;/div&gt;
+  </div>
+  <p>The <code>&lt;?= ... ?&gt;</code> is PHP's short echo tag — it prints a value directly into the HTML.</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section page-break" id="s8">
+  <div class="section-title"><span class="section-num">8</span> CRUD Pages — Customers, Vendors, Products, Orders</div>
+
+  <div class="highlight-box info">
+    <strong>📖 What is CRUD?</strong>
+    CRUD = <strong>C</strong>reate, <strong>R</strong>ead, <strong>U</strong>pdate, <strong>D</strong>elete. These are the 4 basic database operations. Every entity in GrocerCart has all 4 operations implemented across 3 PHP files.
+  </div>
+
+  <!-- CUSTOMERS -->
+  <div class="card blue" style="margin-top:16px">
+    <div class="card-header">
+      <div class="card-icon">👥</div>
+      <div>
+        <div class="card-title">Customers — 3 Files</div>
+        <div class="card-filename">customers_list.php &nbsp;|&nbsp; customers_form.php &nbsp;|&nbsp; customers_delete.php</div>
+      </div>
+    </div>
+
+    <h3>customers_list.php — READ (SELECT)</h3>
+    <div class="code-block">
+<span class="c">// 1. Connect to Oracle</span>
+<span class="f">require_once</span> <span class="s">'db.php'</span>;
+
+<span class="c">// 2. Run SELECT query</span>
+<span class="v">$customers</span> = <span class="f">ociQuery</span>(<span class="s">'SELECT * FROM Customers ORDER BY customer_id DESC'</span>);
+
+<span class="c">// 3. Output HTML — loop through every customer and make a table row</span>
+<span class="k">foreach</span> (<span class="v">$customers</span> <span class="k">as</span> <span class="v">$c</span>):
+    <span class="k">echo</span> <span class="s">"&lt;tr&gt;&lt;td&gt;"</span> . <span class="v">$c</span>[<span class="s">'name'</span>] . <span class="s">"&lt;/td&gt;&lt;td&gt;"</span> . <span class="v">$c</span>[<span class="s">'email'</span>] . <span class="s">"&lt;/td&gt;&lt;/tr&gt;"</span>;
+<span class="k">endforeach</span>;
+    </div>
+
+    <h3>customers_form.php — CREATE + UPDATE (INSERT / UPDATE)</h3>
+    <div class="code-block">
+<span class="c">// If the form was submitted (user clicked Save):</span>
+<span class="k">if</span> (<span class="v">$_SERVER</span>[<span class="s">'REQUEST_METHOD'</span>] === <span class="s">'POST'</span>) {
+
+    <span class="c">// Get values from the HTML form</span>
+    <span class="v">$name</span>  = <span class="v">$_POST</span>[<span class="s">'name'</span>];
+    <span class="v">$email</span> = <span class="v">$_POST</span>[<span class="s">'email'</span>];
+
+    <span class="k">if</span> (!empty(<span class="v">$_POST</span>[<span class="s">'customer_id'</span>])) {
+        <span class="c">// Has an ID → EDIT existing customer (UPDATE)</span>
+        <span class="f">ociExec</span>(
+            <span class="s">'UPDATE Customers SET name=:n, email=:e WHERE customer_id=:id'</span>,
+            [<span class="s">':n'</span> => <span class="v">$name</span>, <span class="s">':e'</span> => <span class="v">$email</span>, <span class="s">':id'</span> => <span class="v">$_POST</span>[<span class="s">'customer_id'</span>]]
+        );
+    } <span class="k">else</span> {
+        <span class="c">// No ID → ADD new customer (INSERT)</span>
+        <span class="f">ociExec</span>(
+            <span class="s">'INSERT INTO Customers (name, email) VALUES (:n, :e)'</span>,
+            [<span class="s">':n'</span> => <span class="v">$name</span>, <span class="s">':e'</span> => <span class="v">$email</span>]
+        );
+    }
+    <span class="c">// Redirect back to the list page after saving</span>
+    <span class="f">header</span>(<span class="s">'Location: customers_list.php'</span>); <span class="k">exit</span>;
+}
+    </div>
+
+    <h3>customers_delete.php — DELETE</h3>
+    <div class="code-block">
+<span class="c">// Get the ID from the URL: customers_delete.php?id=3</span>
+<span class="v">$id</span> = (<span class="k">int</span>) <span class="v">$_GET</span>[<span class="s">'id'</span>];
+
+<span class="c">// Delete the row from Oracle</span>
+<span class="f">ociExec</span>(<span class="s">'DELETE FROM Customers WHERE customer_id = :id'</span>, [<span class="s">':id'</span> => <span class="v">$id</span>]);
+
+<span class="c">// Go back to list</span>
+<span class="f">header</span>(<span class="s">'Location: customers_list.php'</span>); <span class="k">exit</span>;
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div class="card green">
+    <div class="card-header">
+      <div class="card-icon">📦</div>
+      <div>
+        <div class="card-title">Products — 3 Files (Uses JOIN)</div>
+        <div class="card-filename">products_list.php &nbsp;|&nbsp; products_form.php &nbsp;|&nbsp; products_delete.php</div>
+      </div>
+    </div>
+    <p>Products has a special feature — it shows the <strong>vendor name</strong> from the Vendors table using a <strong>LEFT JOIN</strong>. A product belongs to a vendor (vendor_id foreign key).</p>
+    <div class="code-block">
+<span class="c">-- products_list.php runs this JOIN query:</span>
+<span class="sql">SELECT</span> p.*, v.vendor_name
+<span class="sql">FROM</span> Products p
+<span class="sql">LEFT JOIN</span> Vendors v <span class="sql">ON</span> p.vendor_id = v.vendor_id
+<span class="sql">ORDER BY</span> p.product_id <span class="sql">DESC</span>
+
+<span class="c">-- LEFT JOIN means: show ALL products even if they have no vendor</span>
+    </div>
+  </div>
+
+  <!-- ORDERS -->
+  <div class="card orange">
+    <div class="card-header">
+      <div class="card-icon">🛍️</div>
+      <div>
+        <div class="card-title">Orders — 3 Files (Date Handling + Status)</div>
+        <div class="card-filename">orders_list.php &nbsp;|&nbsp; orders_form.php &nbsp;|&nbsp; orders_delete.php</div>
+      </div>
+    </div>
+    <p>Orders uses Oracle's date functions. Oracle stores dates differently from MySQL — we use <code>TO_DATE()</code> to convert a string to an Oracle date, and <code>TO_CHAR()</code> to format it for display.</p>
+    <div class="code-block">
+<span class="c">// Inserting a date into Oracle (from HTML date input)</span>
+<span class="f">ociExec</span>(
+    <span class="s">"INSERT INTO Orders (customer_id, order_date, status)
+     VALUES (:cid, TO_DATE(:dt,'YYYY-MM-DD'), :st)"</span>,
+    [<span class="s">':cid'</span> => <span class="v">$customer_id</span>, <span class="s">':dt'</span> => <span class="s">'2026-06-20'</span>, <span class="s">':st'</span> => <span class="s">'pending'</span>]
+);
+
+<span class="c">// Reading date from Oracle (formatted as readable string)</span>
+<span class="f">ociQuery</span>(<span class="s">"SELECT TO_CHAR(order_date,'YYYY-MM-DD') AS order_date FROM Orders"</span>);
+    </div>
+  </div>
+
+  <!-- ORDER DETAILS -->
+  <div class="card indigo">
+    <div class="card-header">
+      <div class="card-icon">📋</div>
+      <div>
+        <div class="card-title">Order Details — 3 Files (Trigger Auto-Calculates Subtotal)</div>
+        <div class="card-filename">order_details_list.php &nbsp;|&nbsp; order_details_form.php &nbsp;|&nbsp; order_details_delete.php</div>
+      </div>
+    </div>
+    <p>When you insert into Order_Details, you <strong>only provide the quantity</strong>. The Oracle trigger <code>trg_calc_subtotal</code> automatically looks up the price and calculates <code>subtotal = price × quantity</code>. Then <code>trg_update_order_total</code> updates the order's total automatically.</p>
+    <div class="code-block">
+<span class="c">// We only insert order_id, product_id, quantity</span>
+<span class="c">// Oracle triggers handle subtotal and order total automatically</span>
+<span class="f">ociExec</span>(
+    <span class="s">'INSERT INTO Order_Details (order_id, product_id, quantity) VALUES (:oid, :pid, :qty)'</span>,
+    [<span class="s">':oid'</span> => 1, <span class="s">':pid'</span> => 5, <span class="s">':qty'</span> => 3]
+);
+<span class="c">// After this: subtotal = 3 × $4.00 = $12.00 (set by trigger)
+// And Order #1's total_amount is updated to include this (by trigger)</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section page-break" id="s9">
+  <div class="section-title"><span class="section-num">9</span> SQL Operations Showcase — sql_ops.php</div>
+
+  <div class="card purple">
+    <div class="card-header">
+      <div class="card-icon" style="background:#ede9fe;color:#7c3aed;">💻</div>
+      <div>
+        <div class="card-title">sql_ops.php — Live SQL Demonstration Page</div>
+        <div class="card-filename">http://localhost/GrocerCart/sql_ops.php</div>
+      </div>
+    </div>
+    <p>This page runs real Oracle SQL queries and displays both the query code and the results. It is purely for educational/demonstration purposes — it does not modify data.</p>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>SQL Concept</th><th>Oracle Query Used</th><th>What It Demonstrates</th></tr>
+      <tr>
+        <td><span class="badge badge-blue">INNER JOIN</span></td>
+        <td>Order_Details INNER JOIN Orders INNER JOIN Customers INNER JOIN Products</td>
+        <td>Shows order line items with all related names. Only shows rows that match in ALL tables.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-green">LEFT JOIN</span></td>
+        <td>Customers LEFT JOIN Orders</td>
+        <td>Shows ALL customers, even those with no orders. Order columns show NULL for non-buyers.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-orange">RIGHT JOIN</span></td>
+        <td>Order_Details RIGHT JOIN Products</td>
+        <td>Shows ALL products even with zero sales — useful to find unsold inventory.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-purple">Scalar Subquery</span></td>
+        <td>WHERE price > (SELECT AVG(price) FROM Products)</td>
+        <td>Uses a subquery that returns a single value — the average price.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-blue">Subquery with IN</span></td>
+        <td>WHERE customer_id IN (SELECT customer_id FROM Orders WHERE total > 20)</td>
+        <td>Finds customers who placed orders over $20 using a subquery list.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-green">Correlated Subquery</span></td>
+        <td>Subquery references outer query's row</td>
+        <td>For each customer, counts their orders separately — references the outer row.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-orange">EXISTS</span></td>
+        <td>WHERE EXISTS (SELECT 1 FROM Order_Details WHERE ...)</td>
+        <td>Finds products that have been ordered at least once.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-red">NOT EXISTS</span></td>
+        <td>WHERE NOT EXISTS (...)</td>
+        <td>Finds products that have NEVER been ordered.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-blue">UNION</span></td>
+        <td>SELECT email FROM Customers UNION SELECT contact_email FROM Vendors</td>
+        <td>Combines results from 2 queries, removes duplicates.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-purple">INTERSECT</span></td>
+        <td>SELECT email FROM Customers INTERSECT SELECT contact_email FROM Vendors</td>
+        <td>Oracle native — finds emails that appear in BOTH tables.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-red">MINUS</span></td>
+        <td>SELECT email FROM Customers MINUS SELECT contact_email FROM Vendors</td>
+        <td>Oracle's version of EXCEPT — emails in Customers but NOT in Vendors.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-green">GROUP BY + HAVING</span></td>
+        <td>GROUP BY category HAVING COUNT(*) >= 1</td>
+        <td>Groups products by category, filters with HAVING (like WHERE but for groups).</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-orange">CASE WHEN</span></td>
+        <td>CASE WHEN price &lt; 3 THEN 'Budget' WHEN price &lt; 5 THEN 'Standard' ELSE 'Premium'</td>
+        <td>Conditional logic inside SELECT — classifies products by price.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-blue">VIEW Query</span></td>
+        <td>SELECT * FROM CustomerOrderSummary</td>
+        <td>Queries the pre-created view as if it were a table.</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section page-break" id="s10">
+  <div class="section-title"><span class="section-num">10</span> Summary of All Oracle SQL Concepts Used</div>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Category</th><th>Oracle Concept</th><th>Where Used in Project</th></tr>
+      <tr><td>DDL</td><td>CREATE TABLE</td><td>init_db.php — creates 6 tables</td></tr>
+      <tr><td>DDL</td><td>CREATE SEQUENCE</td><td>init_db.php — 6 sequences for auto-increment</td></tr>
+      <tr><td>DDL</td><td>CREATE OR REPLACE TRIGGER</td><td>init_db.php — 10 triggers</td></tr>
+      <tr><td>DDL</td><td>CREATE OR REPLACE VIEW</td><td>init_db.php — CustomerOrderSummary view</td></tr>
+      <tr><td>DDL</td><td>CREATE OR REPLACE PROCEDURE</td><td>init_db.php — get_product_details procedure</td></tr>
+      <tr><td>DML</td><td>INSERT INTO</td><td>*_form.php — adding new records</td></tr>
+      <tr><td>DML</td><td>UPDATE</td><td>*_form.php — editing records</td></tr>
+      <tr><td>DML</td><td>DELETE FROM</td><td>*_delete.php — removing records</td></tr>
+      <tr><td>DQL</td><td>SELECT + WHERE</td><td>All _list.php files</td></tr>
+      <tr><td>DQL</td><td>INNER JOIN</td><td>sql_ops.php, index.php</td></tr>
+      <tr><td>DQL</td><td>LEFT JOIN</td><td>products_list, orders_list, index.php</td></tr>
+      <tr><td>DQL</td><td>RIGHT JOIN</td><td>sql_ops.php</td></tr>
+      <tr><td>DQL</td><td>UNION / INTERSECT / MINUS</td><td>sql_ops.php</td></tr>
+      <tr><td>DQL</td><td>Subquery (Scalar, IN, EXISTS)</td><td>sql_ops.php</td></tr>
+      <tr><td>DQL</td><td>GROUP BY + HAVING</td><td>sql_ops.php, index.php</td></tr>
+      <tr><td>DQL</td><td>ORDER BY + FETCH FIRST n ROWS</td><td>index.php dashboard queries</td></tr>
+      <tr><td>DQL</td><td>CASE WHEN</td><td>sql_ops.php</td></tr>
+      <tr><td>Functions</td><td>COUNT(), SUM(), AVG(), MIN(), MAX()</td><td>index.php stat cards</td></tr>
+      <tr><td>Functions</td><td>NVL() (= COALESCE in MySQL)</td><td>All sum/avg queries</td></tr>
+      <tr><td>Functions</td><td>TO_DATE(), TO_CHAR()</td><td>orders_form.php date handling</td></tr>
+      <tr><td>Constraints</td><td>PRIMARY KEY, FOREIGN KEY, UNIQUE, CHECK, NOT NULL</td><td>All 6 tables in init_db.php</td></tr>
+      <tr><td>PL/SQL</td><td>DECLARE / BEGIN / END blocks</td><td>All 10 triggers, stored procedure</td></tr>
+      <tr><td>PL/SQL</td><td>:NEW / :OLD pseudo-records</td><td>Triggers (access inserted/updated values)</td></tr>
+      <tr><td>PL/SQL</td><td>PRAGMA AUTONOMOUS_TRANSACTION</td><td>trg_update_order_total (avoid mutating table)</td></tr>
+      <tr><td>PL/SQL</td><td>RAISE_APPLICATION_ERROR</td><td>trg_check_price (reject negative prices)</td></tr>
+      <tr><td>PL/SQL</td><td>EXCEPTION / NO_DATA_FOUND</td><td>Stored procedure, trg_calc_subtotal</td></tr>
+    </table>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section page-break" id="s11">
+  <div class="section-title"><span class="section-num">11</span> How to Run the Project</div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <strong>Start XAMPP</strong>
+        Open XAMPP Control Panel → Start <strong>Apache</strong>. (You do NOT need MySQL — we use Oracle.)
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <strong>Start Oracle XE</strong>
+        Oracle XE runs as a Windows Service. It should start automatically. You can verify in SQL Developer — connect as <code>salehin_076923 / 2207045</code>.
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <strong>Initialize the Database (first time only)</strong>
+        Open browser → go to: <code>http://localhost/GrocerCart/init_db.php</code><br>
+        You will see a green log of all tables being created. Click "Go to Dashboard" when done.
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <strong>Use the Application</strong>
+        Go to <code>http://localhost/GrocerCart/</code> — you will see the full dashboard with data from Oracle.
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <strong>Verify in SQL Developer</strong>
+        Open Oracle SQL Developer → connect as <code>salehin_076923</code> → expand Tables → you will see all 6 tables with data.
+        Run: <code>SELECT * FROM Customers;</code> to confirm the data.
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight-box danger">
+    <strong>⚠️ If you see "Oracle Connection Failed"</strong>
+    Make sure Oracle's Windows service is running. Go to Windows Services (services.msc) and look for <strong>OracleXETNSListener</strong> and <strong>OracleServiceXE</strong> — both should be "Running". If not, right-click → Start.
+  </div>
+
+  <div class="highlight-box warning">
+    <strong>🔄 To Reset the Database (start fresh)</strong>
+    Visit: <code>http://localhost/GrocerCart/init_db.php?reset=1</code>
+    This drops ALL tables and recreates everything from scratch with fresh sample data.
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section page-break" id="s12">
+  <div class="section-title"><span class="section-num">12</span> Key Differences — MySQL vs Oracle</div>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Feature</th><th>MySQL (GreenCart original)</th><th>Oracle XE (Our GrocerCart)</th></tr>
+      <tr>
+        <td>Auto-increment IDs</td>
+        <td><code>INT AUTO_INCREMENT PRIMARY KEY</code></td>
+        <td><code>NUMBER PRIMARY KEY</code> + Sequence + BEFORE INSERT Trigger</td>
+      </tr>
+      <tr>
+        <td>Limit rows</td>
+        <td><code>LIMIT 5</code></td>
+        <td><code>FETCH FIRST 5 ROWS ONLY</code></td>
+      </tr>
+      <tr>
+        <td>NULL-safe sum</td>
+        <td><code>COALESCE(SUM(x), 0)</code></td>
+        <td><code>NVL(SUM(x), 0)</code></td>
+      </tr>
+      <tr>
+        <td>Current timestamp</td>
+        <td><code>NOW()</code> or <code>CURRENT_TIMESTAMP</code></td>
+        <td><code>SYSDATE</code></td>
+      </tr>
+      <tr>
+        <td>String data type</td>
+        <td><code>VARCHAR(100)</code></td>
+        <td><code>VARCHAR2(100)</code></td>
+      </tr>
+      <tr>
+        <td>Set difference</td>
+        <td><code>NOT IN</code> (EXCEPT not native)</td>
+        <td><code>MINUS</code> (native Oracle keyword)</td>
+      </tr>
+      <tr>
+        <td>Set intersection</td>
+        <td>Emulated with IN subquery</td>
+        <td><code>INTERSECT</code> (native Oracle keyword)</td>
+      </tr>
+      <tr>
+        <td>PHP Connection</td>
+        <td><code>new PDO('mysql:...')</code></td>
+        <td><code>oci_connect('user', 'pass', 'host/XE')</code></td>
+      </tr>
+      <tr>
+        <td>PHP Execute SQL</td>
+        <td><code>$pdo->prepare(); $stmt->execute();</code></td>
+        <td><code>oci_parse(); oci_bind_by_name(); oci_execute();</code></td>
+      </tr>
+      <tr>
+        <td>PHP Fetch Row</td>
+        <td><code>$stmt->fetch(PDO::FETCH_ASSOC)</code></td>
+        <td><code>oci_fetch_assoc($stmt)</code></td>
+      </tr>
+      <tr>
+        <td>Commit changes</td>
+        <td>Auto-committed by default</td>
+        <td>Must call <code>oci_commit($conn)</code> manually</td>
+      </tr>
+      <tr>
+        <td>ENUM type</td>
+        <td><code>ENUM('A','B','C')</code></td>
+        <td><code>VARCHAR2(20) + CHECK (col IN ('A','B','C'))</code></td>
+      </tr>
+      <tr>
+        <td>Date formatting</td>
+        <td><code>DATE_FORMAT(col, '%Y-%m-%d')</code></td>
+        <td><code>TO_CHAR(col, 'YYYY-MM-DD')</code></td>
+      </tr>
+      <tr>
+        <td>String + number concat</td>
+        <td><code>CONCAT(a, b)</code> or <code>a || b</code></td>
+        <td><code>a || b</code> (pipe-pipe is standard in Oracle)</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="highlight-box success" style="margin-top:20px">
+    <strong>✅ Summary</strong>
+    GrocerCart is a complete, working PHP web application that stores all data in Oracle XE 11g. 
+    The PHP files act as the middle layer — they receive user requests from the browser, 
+    run Oracle SQL queries via OCI8, format the results as HTML, and send back styled web pages. 
+    Every major SQL concept (JOINs, subqueries, set operations, aggregation, triggers, views, 
+    stored procedures, constraints) is implemented and visible in the application.
+  </div>
+
+  <div style="margin-top:32px; text-align:center; color:#64748b; font-size:12px; border-top:1px solid #e2e8f0; padding-top:20px;">
+    <strong>GrocerCart</strong> — PHP 8.2 + Oracle XE 11g OCI8 · Database Systems Lab Project · June 2026<br>
+    Student: Nazmus Salehin Nirob &nbsp;|&nbsp; Oracle Schema: salehin_076923@localhost/XE
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+  // Smooth scroll for TOC links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>
